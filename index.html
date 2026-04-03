@@ -492,23 +492,42 @@ async function callAI(msg,extra=''){
   if(A.ch.length>16)A.ch=A.ch.slice(-16);
   try{
     var messages=[{role:'system',content:SYS+(extra?' '+extra:'')}].concat(A.ch);
-    var r=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:messages,max_tokens:1500,temperature:0.7})});
+    console.log('Calling Groq API...');
+    var r=await fetch(GROQ_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+GROQ_KEY
+      },
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:messages,
+        max_tokens:1500,
+        temperature:0.7
+      })
+    });
+    console.log('Response status:',r.status);
     var d=await r.json();
-    if(d.error){console.error('Groq error:',d.error);return 'Error: '+d.error.message;}
+    console.log('Response data:',d);
+    if(d.error){console.error('Groq error:',d.error);return 'API Error: '+d.error.message;}
     var reply=d.choices?.[0]?.message?.content||'Error. Try again.';
     A.ch.push({role:'assistant',content:reply});
     return reply;
-  }catch(e){console.error('callAI error:',e);return'Network error.';}
+  }catch(e){
+    console.error('callAI fetch error:',e.name,e.message);
+    return'Error: '+e.message;
+  }
 }
 
 async function callQAI(topic,diff){
 var w=getWeak();
-var pr=‘You are an expert ASCeXAM echocardiography board exam question writer. ‘+
-(w.length?‘Weak areas: ‘+w.join(’, ‘)+’. ‘:’’)+
-‘Generate ONE ‘+(diff||‘medium’)+’ difficulty MCQ on: “’+topic+’”. ‘+
-‘Physics questions need extra detail. Base on ASE guidelines, Klein Echo Review, Pai 500 MCQs. ‘+
-‘RESPOND ONLY WITH VALID JSON, no markdown, no backticks: ‘+
-‘{“question”:”…”,“options”:[“A. …”,“B. …”,“C. …”,“D. …”],“correct”:0,“explanation”:”…with guideline…”,“topic”:”’+topic+’”,“difficulty”:”’+(diff||‘Medium’)+’”,“pearl”:”…exam pearl…”}’;
+var weakStr = w.length > 0 ? ‘Weak areas: ’ + w.join(’, ‘) + ‘. ’ : ‘’;
+var diffStr = diff || ‘medium’;
+var pr = ‘You are an expert ASCeXAM echocardiography board exam question writer. ’ + weakStr +
+‘Generate ONE ’ + diffStr + ’ difficulty MCQ on: ’ + topic + ‘. ’ +
+‘Physics questions need extra detail. Base on ASE guidelines, Klein Echo Review, Pai 500 MCQs. ’ +
+‘Output ONLY valid JSON with no markdown and no backticks: ’ +
+‘{“question”:”…”,“options”:[“A. …”,“B. …”,“C. …”,“D. …”],“correct”:0,“explanation”:”…with guideline…”,“topic”:”’ + topic + ‘”,“difficulty”:”’ + diffStr + ‘”,“pearl”:”…exam pearl…”}’;
 try{
 var r=await fetch(GROQ_URL,{method:‘POST’,headers:{‘Content-Type’:‘application/json’,‘Authorization’:‘Bearer ‘+GROQ_KEY},body:JSON.stringify({model:‘llama-3.3-70b-versatile’,messages:[{role:‘system’,content:‘You are an expert echocardiography board exam question writer. Output ONLY valid JSON, no markdown, no backticks, no extra text.’},{role:‘user’,content:pr}],max_tokens:1000,temperature:0.8})});
 var d=await r.json();
