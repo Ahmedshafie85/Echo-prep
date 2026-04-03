@@ -234,9 +234,11 @@ btn.disabled = false;
 }
 };
 
-// ── AI CALL ──
-window.callAI = async (userMessage, systemExtra = ‘’) => {
-const SYSTEM = `You are EchoPrep — an expert echocardiography board exam tutor preparing a cardiologist (Dr. Ahmed) for the ASCeXAM® exam by NBE.
+// ── AI CALL (Gemini) ──
+const GEMINI_KEY = ‘AIzaSyAOpOse_cVRPVup09iaeFGSYiNskS0UOIo’;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+
+const ECHO_SYSTEM = `You are EchoPrep — an expert echocardiography board exam tutor preparing a cardiologist (Dr. Ahmed) for the ASCeXAM® exam by NBE.
 
 Your knowledge is grounded in:
 
@@ -257,491 +259,448 @@ FORMATTING (use HTML tags):
 - <div class="vbox"><div class="vbox-title">TITLE</div>content</div> for reference boxes
 - <table class="etable"> for grading tables with <th> and <td>
 - Keep responses board-focused, high-yield, cite specific guideline versions
-- Flag “🎯 Exam Pearl:” for key board points
-
-${systemExtra}`;
-
-```
-APP.conversationHistory.push({ role: 'user', content: userMessage });
-if (APP.conversationHistory.length > 20) APP.conversationHistory = APP.conversationHistory.slice(-20);
-
-const resp = await fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+- Flag “🎯 Exam Pearl:” for key board points`;
+  
+  window.callAI = async (userMessage, systemExtra = ‘’) => {
+  APP.conversationHistory.push({ role: ‘user’, parts: [{ text: userMessage }] });
+  if (APP.conversationHistory.length > 20) APP.conversationHistory = APP.conversationHistory.slice(-20);
+  
+  const body = {
+  system_instruction: { parts: [{ text: ECHO_SYSTEM + (systemExtra ? ’
+  ’ + systemExtra : ‘’) }] },
+  contents: APP.conversationHistory,
+  generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
+  };
+  
+  try {
+  const resp = await fetch(GEMINI_URL, {
+  method: ‘POST’,
+  headers: { ‘Content-Type’: ‘application/json’ },
+  body: JSON.stringify(body)
+  });
+  const data = await resp.json();
+  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || ‘Error getting response. Please try again.’;
+  APP.conversationHistory.push({ role: ‘model’, parts: [{ text: reply }] });
+  return reply;
+  } catch(e) {
+  return ‘Network error. Please check your connection and try again.’;
+  }
+  };
+  
+  // ── QUIZ AI (Gemini) ──
+  window.callQuizAI = async (topic, difficulty) => {
+  const topicLabel = topic === ‘all’ ? ‘any echocardiography board exam topic’ : topic;
+  const dueSRS = Object.entries(APP.srsData)
+  .filter(([_, v]) => v.nextReview && v.nextReview <= Date.now())
+  .slice(0, 3).map(([k]) => k);
+  
+  const srsHint = dueSRS.length > 0 ? `Priority: revisit concepts related to: ${dueSRS.join(', ')}. ` : ‘’;
+  const weakTopics = getWeakTopics();
+  const weakHint = weakTopics.length > 0 ? `Weak areas to emphasize: ${weakTopics.join(', ')}. ` : ‘’;
+  
+  const prompt = `You are an expert echocardiography board exam question writer for ASCeXAM. ${srsHint}${weakHint} Generate one ${difficulty || 'medium'} difficulty ASCeXAM-style MCQ on: ${topicLabel}. Physics questions should be especially detailed. Base questions on: ASE guidelines, Klein Echo Review, Pai 500 MCQs, Feigenbaum, ACC/AHA guidelines. CRITICAL: Respond ONLY with valid JSON, absolutely no markdown, no backticks, no extra text whatsoever: {"question":"...","options":["A. ...","B. ...","C. ...","D. ..."],"correct":0,"explanation":"...detailed with guideline citation...","topic":"${topicLabel}","difficulty":"${difficulty||'Medium'}","pearl":"...one key exam pearl..."}`;
+  
+  try {
+  const resp = await fetch(GEMINI_URL, {
+  method: ‘POST’,
+  headers: { ‘Content-Type’: ‘application/json’ },
   body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1500,
-    system: SYSTEM,
-    messages: APP.conversationHistory
+  contents: [{ role: ‘user’, parts: [{ text: prompt }] }],
+  generationConfig: { maxOutputTokens: 1000, temperature: 0.8 }
   })
-});
-const data = await resp.json();
-const reply = data.content?.[0]?.text || 'Error getting response';
-APP.conversationHistory.push({ role: 'assistant', content: reply });
-return reply;
-```
-
-};
-
-// ── QUIZ AI ──
-window.callQuizAI = async (topic, difficulty) => {
-const topicLabel = topic === ‘all’ ? ‘any echocardiography board exam topic’ : topic;
-const dueSRS = Object.entries(APP.srsData)
-.filter(([_, v]) => v.nextReview && v.nextReview <= Date.now())
-.slice(0, 3).map(([k]) => k);
-
-```
-const srsHint = dueSRS.length > 0 ? `Priority: revisit concepts related to: ${dueSRS.join(', ')}. ` : '';
-const weakTopics = getWeakTopics();
-const weakHint = weakTopics.length > 0 ? `Weak areas to emphasize: ${weakTopics.join(', ')}. ` : '';
-
-const prompt = `${srsHint}${weakHint}Generate one ${difficulty || 'medium'} difficulty ASCeXAM-style MCQ on: ${topicLabel}.
-```
-
-Physics questions should be especially detailed.
-CRITICAL: Respond ONLY with valid JSON, no markdown, no backticks, no extra text:
-{“question”:”…”,“options”:[“A. …”,“B. …”,“C. …”,“D. …”],“correct”:0,“explanation”:”…detailed with guideline citation…”,“topic”:”${topicLabel}”,“difficulty”:”${difficulty||‘Medium’}”,“pearl”:”…one key exam pearl…”}`;
-
-```
-const resp = await fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1000,
-    system: 'You are an expert echocardiography board exam question writer. Output ONLY valid JSON with no markdown formatting or backticks whatsoever.',
-    messages: [{ role: 'user', content: prompt }]
-  })
-});
-const data = await resp.json();
-let text = data.content?.[0]?.text || '{}';
-text = text.replace(/```json|```/g, '').trim();
-try { return JSON.parse(text); } catch(e) { return null; }
-```
-
-};
-
-// ── RENDER DASHBOARD ──
-window.renderDashboard = () => {
-const total = Object.values(APP.progressData).reduce((s,t) => s + (t.attempted||0), 0);
-const correct = Object.values(APP.progressData).reduce((s,t) => s + (t.correct||0), 0);
-const accuracy = total > 0 ? Math.round(correct/total*100) : 0;
-const daysLeft = Math.max(0, Math.ceil((new Date(APP.settings.examDate || ‘2026-07-01’) - new Date()) / 86400000));
-const readiness = calculateReadiness();
-
-```
-document.getElementById('stat-total').textContent = total;
-document.getElementById('stat-accuracy').textContent = total > 0 ? accuracy + '%' : '—';
-document.getElementById('stat-days').textContent = daysLeft;
-document.getElementById('stat-readiness').textContent = readiness + '%';
-document.getElementById('streak-count').textContent = APP.streak.count;
-
-// Pearl of the day
-renderPearl();
-
-// Weak topics
-renderWeakTopics();
-
-// Radar chart
-renderRadar();
-
-// SRS due
-const due = Object.values(APP.srsData).filter(v => v.nextReview && v.nextReview <= Date.now()).length;
-document.getElementById('srs-due').textContent = due;
-```
-
-};
-
-function calculateReadiness() {
-const topics = TOPICS.length;
-let score = 0;
-TOPICS.forEach(t => {
-const p = APP.progressData[t.id];
-if (p && p.attempted >= 5) {
-score += (p.correct / p.attempted);
-}
-});
-return Math.round((score / topics) * 100);
-}
-
-function getWeakTopics() {
-return TOPICS.filter(t => {
-const p = APP.progressData[t.id];
-return p && p.attempted >= 3 && (p.correct / p.attempted) < 0.7;
-}).map(t => t.label).slice(0, 3);
-}
-
-window.renderWeakTopics = () => {
-const weak = TOPICS.filter(t => {
-const p = APP.progressData[t.id];
-return p && p.attempted >= 3 && (p.correct / p.attempted) < 0.7;
-}).sort((a, b) => {
-const pa = APP.progressData[a.id], pb = APP.progressData[b.id];
-return (pa.correct/pa.attempted) - (pb.correct/pb.attempted);
-}).slice(0, 5);
-
-```
-const el = document.getElementById('weak-topics-list');
-if (!el) return;
-if (weak.length === 0) {
-  el.innerHTML = '<div class="no-weak">No weak topics yet — keep studying! 🎯</div>';
+  });
+  const data = await resp.json();
+  let text = data.candidates?.[0]?.content?.parts?.[0]?.text || ‘{}’;
+  text = text.replace(/`json|`/g, ‘’).trim();
+  try { return JSON.parse(text); } catch(e) { return null; }
+  } catch(e) { return null; }
+  };
+  
+  // ── RENDER DASHBOARD ──
+  window.renderDashboard = () => {
+  const total = Object.values(APP.progressData).reduce((s,t) => s + (t.attempted||0), 0);
+  const correct = Object.values(APP.progressData).reduce((s,t) => s + (t.correct||0), 0);
+  const accuracy = total > 0 ? Math.round(correct/total*100) : 0;
+  const daysLeft = Math.max(0, Math.ceil((new Date(APP.settings.examDate || ‘2026-07-01’) - new Date()) / 86400000));
+  const readiness = calculateReadiness();
+  
+  document.getElementById(‘stat-total’).textContent = total;
+  document.getElementById(‘stat-accuracy’).textContent = total > 0 ? accuracy + ‘%’ : ‘—’;
+  document.getElementById(‘stat-days’).textContent = daysLeft;
+  document.getElementById(‘stat-readiness’).textContent = readiness + ‘%’;
+  document.getElementById(‘streak-count’).textContent = APP.streak.count;
+  
+  // Pearl of the day
+  renderPearl();
+  
+  // Weak topics
+  renderWeakTopics();
+  
+  // Radar chart
+  renderRadar();
+  
+  // SRS due
+  const due = Object.values(APP.srsData).filter(v => v.nextReview && v.nextReview <= Date.now()).length;
+  document.getElementById(‘srs-due’).textContent = due;
+  };
+  
+  function calculateReadiness() {
+  const topics = TOPICS.length;
+  let score = 0;
+  TOPICS.forEach(t => {
+  const p = APP.progressData[t.id];
+  if (p && p.attempted >= 5) {
+  score += (p.correct / p.attempted);
+  }
+  });
+  return Math.round((score / topics) * 100);
+  }
+  
+  function getWeakTopics() {
+  return TOPICS.filter(t => {
+  const p = APP.progressData[t.id];
+  return p && p.attempted >= 3 && (p.correct / p.attempted) < 0.7;
+  }).map(t => t.label).slice(0, 3);
+  }
+  
+  window.renderWeakTopics = () => {
+  const weak = TOPICS.filter(t => {
+  const p = APP.progressData[t.id];
+  return p && p.attempted >= 3 && (p.correct / p.attempted) < 0.7;
+  }).sort((a, b) => {
+  const pa = APP.progressData[a.id], pb = APP.progressData[b.id];
+  return (pa.correct/pa.attempted) - (pb.correct/pb.attempted);
+  }).slice(0, 5);
+  
+  const el = document.getElementById(‘weak-topics-list’);
+  if (!el) return;
+  if (weak.length === 0) {
+  el.innerHTML = ‘<div class="no-weak">No weak topics yet — keep studying! 🎯</div>’;
   return;
-}
-el.innerHTML = weak.map(t => {
+  }
+  el.innerHTML = weak.map(t => {
   const p = APP.progressData[t.id];
   const acc = Math.round(p.correct/p.attempted*100);
-  return `<div class="weak-item" onclick="startWeakBooster('${t.id}')">
-    <span class="weak-icon">${t.icon}</span>
-    <div class="weak-info">
-      <div class="weak-label">${t.label}</div>
-      <div class="weak-bar-wrap"><div class="weak-bar" style="width:${acc}%"></div></div>
-    </div>
-    <span class="weak-pct" style="color:${acc<50?'var(--danger)':'var(--warn)'}">${acc}%</span>
-  </div>`;
-}).join('');
-```
-
-};
-
-window.renderRadar = () => {
-const canvas = document.getElementById(‘radar-chart’);
-if (!canvas) return;
-const labels = TOPICS.slice(0, 10).map(t => t.label.substring(0, 12));
-const data = TOPICS.slice(0, 10).map(t => {
-const p = APP.progressData[t.id];
-return p && p.attempted > 0 ? Math.round(p.correct/p.attempted*100) : 0;
-});
-
-```
-if (APP.radarChart) APP.radarChart.destroy();
-APP.radarChart = new Chart(canvas, {
-  type: 'radar',
+  return `<div class="weak-item" onclick="startWeakBooster('${t.id}')"> <span class="weak-icon">${t.icon}</span> <div class="weak-info"> <div class="weak-label">${t.label}</div> <div class="weak-bar-wrap"><div class="weak-bar" style="width:${acc}%"></div></div> </div> <span class="weak-pct" style="color:${acc<50?'var(--danger)':'var(--warn)'}">${acc}%</span> </div>`;
+  }).join(’’);
+  };
+  
+  window.renderRadar = () => {
+  const canvas = document.getElementById(‘radar-chart’);
+  if (!canvas) return;
+  const labels = TOPICS.slice(0, 10).map(t => t.label.substring(0, 12));
+  const data = TOPICS.slice(0, 10).map(t => {
+  const p = APP.progressData[t.id];
+  return p && p.attempted > 0 ? Math.round(p.correct/p.attempted*100) : 0;
+  });
+  
+  if (APP.radarChart) APP.radarChart.destroy();
+  APP.radarChart = new Chart(canvas, {
+  type: ‘radar’,
   data: {
-    labels,
-    datasets: [{
-      label: 'Accuracy %',
-      data,
-      backgroundColor: 'rgba(56,189,248,0.15)',
-      borderColor: 'rgba(56,189,248,0.8)',
-      pointBackgroundColor: '#38bdf8',
-      pointRadius: 4,
-    }]
+  labels,
+  datasets: [{
+  label: ‘Accuracy %’,
+  data,
+  backgroundColor: ‘rgba(56,189,248,0.15)’,
+  borderColor: ‘rgba(56,189,248,0.8)’,
+  pointBackgroundColor: ‘#38bdf8’,
+  pointRadius: 4,
+  }]
   },
   options: {
-    responsive: true, maintainAspectRatio: true,
-    scales: { r: {
-      min: 0, max: 100,
-      ticks: { color: '#64748b', font: { size: 9 }, stepSize: 25 },
-      grid: { color: 'rgba(100,116,139,0.2)' },
-      pointLabels: { color: '#94a3b8', font: { size: 9 } }
-    }},
-    plugins: { legend: { display: false } }
+  responsive: true, maintainAspectRatio: true,
+  scales: { r: {
+  min: 0, max: 100,
+  ticks: { color: ‘#64748b’, font: { size: 9 }, stepSize: 25 },
+  grid: { color: ‘rgba(100,116,139,0.2)’ },
+  pointLabels: { color: ‘#94a3b8’, font: { size: 9 } }
+  }},
+  plugins: { legend: { display: false } }
   }
-});
-```
-
-};
-
-const PEARLS = [
-“Speed of sound in tissue = 1540 m/s. Independent of frequency.”,
-“Nyquist limit = PRF/2. Aliasing occurs when velocity exceeds this.”,
-“ASE 2025: Grade 1 diastolic dysfunction = impaired relaxation with normal filling pressures.”,
-“Severe AS: AVA < 1.0 cm², mean gradient > 40 mmHg, Vmax > 4 m/s.”,
-“PISA principle is based on law of conservation of mass (continuity equation).”,
-“Normal LVEF by biplane Simpson: ≥ 52% men, ≥ 54% women (ASE 2015).”,
-“E/e’ > 14 (average) suggests elevated LV filling pressures (ASE 2016).”,
-“Severe MR: ERO ≥ 0.40 cm², RVol ≥ 60 mL, RF ≥ 50%.”,
-“Axial resolution = spatial pulse length / 2. Improves with higher frequency.”,
-“Lateral resolution depends on beam width — worst at far field.”,
-“MVA by PHT: MVA = 220/PHT. Normal MVA = 4–6 cm².”,
-“RV FAC < 35% = abnormal RV systolic function (ASE 2010/2025).”,
-“TAPSE < 17 mm indicates RV systolic dysfunction.”,
-“GLS < -20% is considered abnormal (ASE/EACVI 2024 consensus).”,
-“Severe TR: EROA ≥ 0.40 cm², vena contracta ≥ 0.7 cm.”,
-“Constrictive pericarditis: septal bounce + respirophasic variation > 25% in mitral E.”,
-“Hypertrophic CMP: SAM of MV causes dynamic LVOT obstruction.”,
-“Severe AR: regurgitant fraction ≥ 50%, ERO ≥ 0.30 cm².”,
-“PHT method unreliable after MVR or with severe AR (shortens PHT artificially).”,
-“Frame rate increases with: ↓ depth, ↓ sector angle, ↓ line density.”
-];
-
-window.renderPearl = () => {
-const idx = new Date().getDate() % PEARLS.length;
-const el = document.getElementById(‘pearl-text’);
-if (el) {
-el.style.opacity = ‘0’;
-el.textContent = PEARLS[idx];
-setTimeout(() => { el.style.transition = ‘opacity 0.5s’; el.style.opacity = ‘1’; }, 50);
-}
-};
-
-// ── TOPICS ──
-const TOPICS = [
-{ id: ‘physics’, label: ‘Physics & Artifacts’, icon: ‘〰️’ },
-{ id: ‘doppler’, label: ‘Doppler Principles’, icon: ‘📡’ },
-{ id: ‘anatomy-2d’, label: ‘2D Imaging & Anatomy’, icon: ‘🖼️’ },
-{ id: ‘lv-systolic’, label: ‘LV Systolic Function’, icon: ‘❤️’ },
-{ id: ‘diastology’, label: ‘LV Diastolic Function’, icon: ‘📊’ },
-{ id: ‘rv’, label: ‘RV Assessment’, icon: ‘🫁’ },
-{ id: ‘la’, label: ‘Left Atrium’, icon: ‘🔷’ },
-{ id: ‘mitral-stenosis’, label: ‘Mitral Stenosis’, icon: ‘🔵’ },
-{ id: ‘mitral-regurg’, label: ‘Mitral Regurgitation’, icon: ‘💧’ },
-{ id: ‘aortic-stenosis’, label: ‘Aortic Stenosis’, icon: ‘⬛’ },
-{ id: ‘aortic-regurg’, label: ‘Aortic Regurgitation’, icon: ‘🔄’ },
-{ id: ‘tricuspid’, label: ‘Tricuspid Valve’, icon: ‘🔺’ },
-{ id: ‘pulmonic’, label: ‘Pulmonic Valve’, icon: ‘🫧’ },
-{ id: ‘pericardium’, label: ‘Pericardial Disease’, icon: ‘🫀’ },
-{ id: ‘aorta’, label: ‘Aortic Disease’, icon: ‘🩸’ },
-{ id: ‘cardiomyopathy’, label: ‘Cardiomyopathies’, icon: ‘🧬’ },
-{ id: ‘congenital’, label: ‘Congenital HD’, icon: ‘👶’ },
-{ id: ‘hemodynamics’, label: ‘Hemodynamics’, icon: ‘📈’ },
-{ id: ‘stress-echo’, label: ‘Stress Echo’, icon: ‘🏃’ },
-{ id: ‘tee’, label: ‘TEE’, icon: ‘🖥️’ },
-{ id: ‘contrast’, label: ‘Contrast Echo’, icon: ‘💉’ },
-{ id: ‘strain-gls’, label: ‘Strain & GLS’, icon: ‘📐’ },
-{ id: ‘critical-care’, label: ‘Critical Care Echo’, icon: ‘🏥’ },
-{ id: ‘normal-values’, label: ‘Normal Values’, icon: ‘📋’ },
-{ id: ‘formulas’, label: ‘Formulas & Calc’, icon: ‘🧮’ }
-];
-window.TOPICS = TOPICS;
-
-// ── SHOW APP ──
-function showApp() {
-document.getElementById(‘auth-screen’).style.display = ‘none’;
-document.getElementById(‘app-screen’).style.display = ‘flex’;
-setTimeout(() => {
-renderSidebar();
-navigateTo(‘dashboard’);
-}, 100);
-}
-
-function showAuth() {
-// Temporarily bypassed — no login required
-APP.user = { uid: ‘guest-ahmed’, email: ‘guest@echoprep.app’ };
-document.getElementById(‘user-name-display’).textContent = ‘Ahmed’;
-APP.progressData = JSON.parse(localStorage.getItem(‘ep_progress’) || ‘{}’);
-APP.srsData = JSON.parse(localStorage.getItem(‘ep_srs’) || ‘{}’);
-APP.bookmarks = JSON.parse(localStorage.getItem(‘ep_bookmarks’) || ‘[]’);
-APP.streak = JSON.parse(localStorage.getItem(‘ep_streak’) || ‘{“count”:0,“lastDate”:null}’);
-showApp();
-}
-
-window.renderSidebar = () => {
-const el = document.getElementById(‘topic-list’);
-el.innerHTML = TOPICS.map(t => {
-const p = APP.progressData[t.id];
-const acc = p && p.attempted > 0 ? Math.round(p.correct/p.attempted*100) : null;
-return `<button class="topic-btn ${APP.currentTopic===t.id?'active':''}" onclick="selectTopic('${t.id}')"> <span class="t-icon">${t.icon}</span> <span class="t-label">${t.label}</span> ${acc !== null ? `<span class="t-acc" style="color:${acc>=70?'var(--ok)':acc>=50?'var(--warn)':'var(--danger)'}">${acc}%</span>` : ''} </button>`;
-}).join(’’);
-};
-
-window.selectTopic = (id) => {
-APP.currentTopic = id;
-renderSidebar();
-if (APP.currentMode === ‘study’) loadStudyMode();
-};
-
-// ── NAVIGATION ──
-window.navigateTo = (page) => {
-APP.currentMode = page;
-document.querySelectorAll(’.nav-btn’).forEach(b => b.classList.remove(‘active’));
-document.getElementById(‘nav-’ + page)?.classList.add(‘active’);
-document.querySelectorAll(’.page’).forEach(p => p.style.display = ‘none’);
-document.getElementById(‘page-’ + page).style.display = ‘flex’;
-
-```
-if (page === 'dashboard') renderDashboard();
-if (page === 'study') loadStudyMode();
-if (page === 'mock') setupMockExam();
-if (page === 'reference') renderReference();
-if (page === 'bookmarks') renderBookmarks();
-if (page === 'library') renderLibrary();
-if (page === 'settings') renderSettings();
-```
-
-};
-
-// ── STUDY MODE ──
-window.loadStudyMode = () => {
-const mode = APP.studyMode;
-document.getElementById(‘study-content’).innerHTML = ‘’;
-APP.conversationHistory = [];
-if (mode === ‘quiz’) renderQuizUI();
-if (mode === ‘tutor’) renderTutorUI();
-if (mode === ‘vignette’) renderVignetteUI();
-};
-
-window.setStudyMode = (mode) => {
-APP.studyMode = mode;
-document.querySelectorAll(’.mode-tab’).forEach(b => b.classList.remove(‘active’));
-document.querySelector(`[data-mode="${mode}"]`)?.classList.add(‘active’);
-loadStudyMode();
-};
-
-// ── QUIZ UI ──
-window.renderQuizUI = () => {
-const topic = TOPICS.find(t => t.id === APP.currentTopic) || { label: ‘All Topics’ };
-const sc = document.getElementById(‘study-content’);
-sc.innerHTML = ` <div class="quiz-header"> <div> <div class="quiz-topic-label">${APP.currentTopic === 'all' ? '🔬 All Topics' : TOPICS.find(t=>t.id===APP.currentTopic)?.icon + ' ' + topic.label}</div> <div class="quiz-score-label" id="quiz-score-display">Score: ${APP.quizScore.correct}/${APP.quizScore.total}</div> </div> <div style="display:flex;gap:8px;align-items:center"> <select id="diff-select" class="diff-sel"> <option value="easy">Easy</option> <option value="medium" selected>Medium</option> <option value="hard">Hard</option> <option value="random">Random</option> </select> <button class="btn-primary" onclick="generateQuiz()">Generate Question</button> </div> </div> <div id="quiz-area"></div>`;
-generateQuiz();
-};
-
-window.generateQuiz = async () => {
-const area = document.getElementById(‘quiz-area’);
-area.innerHTML = `<div class="loading-card"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Generating question...</div></div>`;
-const diff = document.getElementById(‘diff-select’)?.value || ‘medium’;
-const topic = APP.currentTopic === ‘all’ ? getSmartTopic() : APP.currentTopic;
-const q = await callQuizAI(topic, diff);
-if (!q) { area.innerHTML = ‘<div class="error-card">Failed to generate question. Try again.</div>’; return; }
-renderQuestion(q, area);
-};
-
-function getSmartTopic() {
-// Prioritize physics (weak area), then weak topics, then untouched
-if (Math.random() < 0.25) return ‘physics’;
-const weak = TOPICS.filter(t => {
-const p = APP.progressData[t.id];
-return p && p.attempted >= 3 && (p.correct/p.attempted) < 0.7;
-});
-if (weak.length > 0 && Math.random() < 0.5) return weak[Math.floor(Math.random()*weak.length)].id;
-return TOPICS[Math.floor(Math.random()*TOPICS.length)].id;
-}
-
-window.renderQuestion = (q, container) => {
-const qId = btoa(q.question.substring(0, 30)).replace(/=/g, ‘’);
-container.innerHTML = `<div class="question-card" id="qcard"> <div class="q-meta"> <span class="q-tag topic-tag">${q.topic}</span> <span class="q-tag diff-tag ${q.difficulty?.toLowerCase()}">${q.difficulty}</span> </div> <div class="q-text">${q.question}</div> <div class="q-options" id="q-options"> ${q.options.map((opt, i) =>`
-<button class="q-opt" onclick="selectAnswer(${i}, ${q.correct}, '${qId}', '${q.topic}')" id="opt-${i}">
-<span class="opt-letter">${String.fromCharCode(65+i)}</span>
-<span class="opt-text">${opt.replace(/^[A-D].\s*/,’’)}</span>
-</button>`).join('')} </div> <div class="q-explanation" id="q-exp" style="display:none"> <div class="exp-header">📖 Explanation</div> <div class="exp-body">${q.explanation}</div> ${q.pearl ? `<div class="exp-pearl">🎯 <strong>Exam Pearl:</strong> ${q.pearl}</div>` : ''} <div class="conf-section"> <div class="conf-label">How confident were you?</div> <div class="conf-btns"> <button class="conf-btn got" onclick="rateConfidence('got_it','${qId}',${container === document.getElementById('quiz-area')})">✅ Got it</button> <button class="conf-btn unsure" onclick="rateConfidence('unsure','${qId}',${container === document.getElementById('quiz-area')})">🤔 Unsure</button> <button class="conf-btn guessed" onclick="rateConfidence('guessed','${qId}',${container === document.getElementById('quiz-area')})">🎲 Guessed</button> </div> </div> <div class="q-actions"> <button class="btn-primary" onclick="generateQuiz()">Next Question ➤</button> <button class="btn-secondary" onclick="toggleBookmark('${q.question.replace(/'/g,"\\'")}','${q.topic}')">⭐ Bookmark</button> <button class="btn-secondary" onclick="teachMe('${q.topic}','${q.question.replace(/'/g,"\\'").substring(0,50)}')">📚 Teach Me</button> <button class="btn-secondary" onclick="getYouTube('${q.topic}')">▶️ Videos</button> </div> </div> </div>`;
-window._currentQuestion = q;
-window._currentCorrect = false;
-};
-
-window.selectAnswer = (selected, correct, qId, topic) => {
-const isCorrect = selected === correct;
-window._currentCorrect = isCorrect;
-document.querySelectorAll(’.q-opt’).forEach((btn, i) => {
-btn.disabled = true;
-if (i === correct) btn.classList.add(‘correct’);
-else if (i === selected && !isCorrect) btn.classList.add(‘wrong’);
-});
-document.getElementById(‘q-exp’).style.display = ‘block’;
-saveProgress(topic, isCorrect);
-};
-
-window.rateConfidence = (conf, qId, inQuiz) => {
-saveSRS(qId, window._currentCorrect, conf);
-document.querySelectorAll(’.conf-btn’).forEach(b => b.style.opacity = ‘0.5’);
-showToast(conf === ‘got_it’ ? ‘✅ Marked as known’ : conf === ‘unsure’ ? ‘🔄 Will review soon’ : ‘🎲 Will revisit shortly’);
-};
-
-window.teachMe = async (topic, hint) => {
-const area = document.getElementById(‘quiz-area’);
-const existing = area.querySelector(’.teach-me-panel’);
-if (existing) existing.remove();
-const panel = document.createElement(‘div’);
-panel.className = ‘teach-me-panel loading-card’;
-panel.innerHTML = ‘<div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Loading explanation…</div>’;
-area.appendChild(panel);
-panel.scrollIntoView({ behavior: ‘smooth’ });
-const resp = await callAI(`Give me a deep board-focused explanation of the concept tested in this question about "${hint}" in the topic "${topic}". Include all relevant cutoffs, formulas, and guideline references. Use HTML formatting.`);
-panel.innerHTML = `<div class="teach-header">📚 Deep Dive: ${topic}</div><div class="teach-body">${resp}</div>`;
-};
-
-window.getYouTube = async (topic) => {
-const area = document.getElementById(‘quiz-area’);
-const existing = area.querySelector(’.yt-panel’);
-if (existing) { existing.remove(); return; }
-const panel = document.createElement(‘div’);
-panel.className = ‘yt-panel loading-card’;
-panel.innerHTML = ‘<div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Finding videos…</div>’;
-area.appendChild(panel);
-
-```
-const resp = await callAI(`List 4 specific YouTube search queries to find the best educational videos about "${topic}" in echocardiography for board exam preparation. Also list these reliable echo YouTube channels: 123Sonography, ASE official, Mayo Clinic Cardiovascular, EchoNation. Format as JSON array: [{"title":"...","search":"...","channel":"..."}]`, 'Respond ONLY with a JSON array, no other text.');
-let videos = [];
-try {
-  const clean = resp.replace(/```json|```/g,'').trim();
-  videos = JSON.parse(clean);
-} catch(e) {
-  videos = [
-    { title: '123Sonography - Echo Education', search: '123sonography echocardiography ' + topic, channel: '123Sonography' },
-    { title: 'ASE Guidelines Webinar', search: 'ASE echocardiography ' + topic + ' guidelines', channel: 'ASE Official' },
-    { title: 'Mayo Clinic Echo Teaching', search: 'Mayo Clinic echo ' + topic, channel: 'Mayo Clinic CV' },
-    { title: 'Board Review - ' + topic, search: 'echocardiography board review ' + topic, channel: 'EchoNation' }
+  });
+  };
+  
+  const PEARLS = [
+  “Speed of sound in tissue = 1540 m/s. Independent of frequency.”,
+  “Nyquist limit = PRF/2. Aliasing occurs when velocity exceeds this.”,
+  “ASE 2025: Grade 1 diastolic dysfunction = impaired relaxation with normal filling pressures.”,
+  “Severe AS: AVA < 1.0 cm², mean gradient > 40 mmHg, Vmax > 4 m/s.”,
+  “PISA principle is based on law of conservation of mass (continuity equation).”,
+  “Normal LVEF by biplane Simpson: ≥ 52% men, ≥ 54% women (ASE 2015).”,
+  “E/e’ > 14 (average) suggests elevated LV filling pressures (ASE 2016).”,
+  “Severe MR: ERO ≥ 0.40 cm², RVol ≥ 60 mL, RF ≥ 50%.”,
+  “Axial resolution = spatial pulse length / 2. Improves with higher frequency.”,
+  “Lateral resolution depends on beam width — worst at far field.”,
+  “MVA by PHT: MVA = 220/PHT. Normal MVA = 4–6 cm².”,
+  “RV FAC < 35% = abnormal RV systolic function (ASE 2010/2025).”,
+  “TAPSE < 17 mm indicates RV systolic dysfunction.”,
+  “GLS < -20% is considered abnormal (ASE/EACVI 2024 consensus).”,
+  “Severe TR: EROA ≥ 0.40 cm², vena contracta ≥ 0.7 cm.”,
+  “Constrictive pericarditis: septal bounce + respirophasic variation > 25% in mitral E.”,
+  “Hypertrophic CMP: SAM of MV causes dynamic LVOT obstruction.”,
+  “Severe AR: regurgitant fraction ≥ 50%, ERO ≥ 0.30 cm².”,
+  “PHT method unreliable after MVR or with severe AR (shortens PHT artificially).”,
+  “Frame rate increases with: ↓ depth, ↓ sector angle, ↓ line density.”
   ];
-}
-panel.className = 'yt-panel';
-panel.innerHTML = `<div class="yt-header">▶️ Recommended Videos: ${topic}</div>
-  <div class="yt-grid">
-    ${videos.map(v => `
-      <a class="yt-card" href="https://www.youtube.com/results?search_query=${encodeURIComponent(v.search)}" target="_blank">
-        <div class="yt-thumb">▶</div>
-        <div class="yt-info">
-          <div class="yt-title">${v.title}</div>
-          <div class="yt-channel">${v.channel}</div>
-        </div>
-      </a>`).join('')}
+  
+  window.renderPearl = () => {
+  const idx = new Date().getDate() % PEARLS.length;
+  const el = document.getElementById(‘pearl-text’);
+  if (el) {
+  el.style.opacity = ‘0’;
+  el.textContent = PEARLS[idx];
+  setTimeout(() => { el.style.transition = ‘opacity 0.5s’; el.style.opacity = ‘1’; }, 50);
+  }
+  };
+  
+  // ── TOPICS ──
+  const TOPICS = [
+  { id: ‘physics’, label: ‘Physics & Artifacts’, icon: ‘〰️’ },
+  { id: ‘doppler’, label: ‘Doppler Principles’, icon: ‘📡’ },
+  { id: ‘anatomy-2d’, label: ‘2D Imaging & Anatomy’, icon: ‘🖼️’ },
+  { id: ‘lv-systolic’, label: ‘LV Systolic Function’, icon: ‘❤️’ },
+  { id: ‘diastology’, label: ‘LV Diastolic Function’, icon: ‘📊’ },
+  { id: ‘rv’, label: ‘RV Assessment’, icon: ‘🫁’ },
+  { id: ‘la’, label: ‘Left Atrium’, icon: ‘🔷’ },
+  { id: ‘mitral-stenosis’, label: ‘Mitral Stenosis’, icon: ‘🔵’ },
+  { id: ‘mitral-regurg’, label: ‘Mitral Regurgitation’, icon: ‘💧’ },
+  { id: ‘aortic-stenosis’, label: ‘Aortic Stenosis’, icon: ‘⬛’ },
+  { id: ‘aortic-regurg’, label: ‘Aortic Regurgitation’, icon: ‘🔄’ },
+  { id: ‘tricuspid’, label: ‘Tricuspid Valve’, icon: ‘🔺’ },
+  { id: ‘pulmonic’, label: ‘Pulmonic Valve’, icon: ‘🫧’ },
+  { id: ‘pericardium’, label: ‘Pericardial Disease’, icon: ‘🫀’ },
+  { id: ‘aorta’, label: ‘Aortic Disease’, icon: ‘🩸’ },
+  { id: ‘cardiomyopathy’, label: ‘Cardiomyopathies’, icon: ‘🧬’ },
+  { id: ‘congenital’, label: ‘Congenital HD’, icon: ‘👶’ },
+  { id: ‘hemodynamics’, label: ‘Hemodynamics’, icon: ‘📈’ },
+  { id: ‘stress-echo’, label: ‘Stress Echo’, icon: ‘🏃’ },
+  { id: ‘tee’, label: ‘TEE’, icon: ‘🖥️’ },
+  { id: ‘contrast’, label: ‘Contrast Echo’, icon: ‘💉’ },
+  { id: ‘strain-gls’, label: ‘Strain & GLS’, icon: ‘📐’ },
+  { id: ‘critical-care’, label: ‘Critical Care Echo’, icon: ‘🏥’ },
+  { id: ‘normal-values’, label: ‘Normal Values’, icon: ‘📋’ },
+  { id: ‘formulas’, label: ‘Formulas & Calc’, icon: ‘🧮’ }
+  ];
+  window.TOPICS = TOPICS;
+  
+  // ── SHOW APP ──
+  function showApp() {
+  document.getElementById(‘auth-screen’).style.display = ‘none’;
+  document.getElementById(‘app-screen’).style.display = ‘flex’;
+  setTimeout(() => {
+  renderSidebar();
+  navigateTo(‘dashboard’);
+  renderPearl();
+  renderDashboard();
+  }, 150);
+  }
+  
+  function showAuth() {
+  // Temporarily bypassed — no login required
+  APP.user = { uid: ‘guest-ahmed’, email: ‘guest@echoprep.app’ };
+  document.getElementById(‘user-name-display’).textContent = ‘Ahmed’;
+  APP.progressData = JSON.parse(localStorage.getItem(‘ep_progress’) || ‘{}’);
+  APP.srsData = JSON.parse(localStorage.getItem(‘ep_srs’) || ‘{}’);
+  APP.bookmarks = JSON.parse(localStorage.getItem(‘ep_bookmarks’) || ‘[]’);
+  APP.streak = JSON.parse(localStorage.getItem(‘ep_streak’) || ‘{“count”:0,“lastDate”:null}’);
+  showApp();
+  }
+  
+  window.renderSidebar = () => {
+  const el = document.getElementById(‘topic-list’);
+  el.innerHTML = TOPICS.map(t => {
+  const p = APP.progressData[t.id];
+  const acc = p && p.attempted > 0 ? Math.round(p.correct/p.attempted*100) : null;
+  return `<button class="topic-btn ${APP.currentTopic===t.id?'active':''}" onclick="selectTopic('${t.id}')"> <span class="t-icon">${t.icon}</span> <span class="t-label">${t.label}</span> ${acc !== null ? `<span class="t-acc" style="color:${acc>=70?'var(--ok)':acc>=50?'var(--warn)':'var(--danger)'}">${acc}%</span>` : ''} </button>`;
+  }).join(’’);
+  };
+  
+  window.selectTopic = (id) => {
+  APP.currentTopic = id;
+  renderSidebar();
+  if (APP.currentMode === ‘study’) loadStudyMode();
+  };
+  
+  // ── NAVIGATION ──
+  window.navigateTo = (page) => {
+  APP.currentMode = page;
+  document.querySelectorAll(’.nav-btn’).forEach(b => b.classList.remove(‘active’));
+  document.getElementById(‘nav-’ + page)?.classList.add(‘active’);
+  document.querySelectorAll(’.page’).forEach(p => p.style.display = ‘none’);
+  document.getElementById(‘page-’ + page).style.display = ‘flex’;
+  
+  if (page === ‘dashboard’) renderDashboard();
+  if (page === ‘study’) loadStudyMode();
+  if (page === ‘mock’) setupMockExam();
+  if (page === ‘reference’) renderReference();
+  if (page === ‘bookmarks’) renderBookmarks();
+  if (page === ‘library’) renderLibrary();
+  if (page === ‘settings’) renderSettings();
+  };
+  
+  // ── STUDY MODE ──
+  window.loadStudyMode = () => {
+  const mode = APP.studyMode;
+  document.getElementById(‘study-content’).innerHTML = ‘’;
+  APP.conversationHistory = []; // Gemini format: [{role:‘user’,parts:[{text:’…’}]}]
+  if (mode === ‘quiz’) renderQuizUI();
+  if (mode === ‘tutor’) renderTutorUI();
+  if (mode === ‘vignette’) renderVignetteUI();
+  };
+  
+  window.setStudyMode = (mode) => {
+  APP.studyMode = mode;
+  document.querySelectorAll(’.mode-tab’).forEach(b => b.classList.remove(‘active’));
+  document.querySelector(`[data-mode="${mode}"]`)?.classList.add(‘active’);
+  loadStudyMode();
+  };
+  
+  // ── QUIZ UI ──
+  window.renderQuizUI = () => {
+  const topic = TOPICS.find(t => t.id === APP.currentTopic) || { label: ‘All Topics’ };
+  const sc = document.getElementById(‘study-content’);
+  sc.innerHTML = ` <div class="quiz-header"> <div> <div class="quiz-topic-label">${APP.currentTopic === 'all' ? '🔬 All Topics' : TOPICS.find(t=>t.id===APP.currentTopic)?.icon + ' ' + topic.label}</div> <div class="quiz-score-label" id="quiz-score-display">Score: ${APP.quizScore.correct}/${APP.quizScore.total}</div> </div> <div style="display:flex;gap:8px;align-items:center"> <select id="diff-select" class="diff-sel"> <option value="easy">Easy</option> <option value="medium" selected>Medium</option> <option value="hard">Hard</option> <option value="random">Random</option> </select> <button class="btn-primary" onclick="generateQuiz()">Generate Question</button> </div> </div> <div id="quiz-area"></div>`;
+  generateQuiz();
+  };
+  
+  window.generateQuiz = async () => {
+  const area = document.getElementById(‘quiz-area’);
+  area.innerHTML = `<div class="loading-card"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Generating question...</div></div>`;
+  const diff = document.getElementById(‘diff-select’)?.value || ‘medium’;
+  const topic = APP.currentTopic === ‘all’ ? getSmartTopic() : APP.currentTopic;
+  const q = await callQuizAI(topic, diff);
+  if (!q) { area.innerHTML = ‘<div class="error-card">Failed to generate question. Try again.</div>’; return; }
+  renderQuestion(q, area);
+  };
+  
+  function getSmartTopic() {
+  // Prioritize physics (weak area), then weak topics, then untouched
+  if (Math.random() < 0.25) return ‘physics’;
+  const weak = TOPICS.filter(t => {
+  const p = APP.progressData[t.id];
+  return p && p.attempted >= 3 && (p.correct/p.attempted) < 0.7;
+  });
+  if (weak.length > 0 && Math.random() < 0.5) return weak[Math.floor(Math.random()*weak.length)].id;
+  return TOPICS[Math.floor(Math.random()*TOPICS.length)].id;
+  }
+  
+  window.renderQuestion = (q, container) => {
+  const qId = btoa(q.question.substring(0, 30)).replace(/=/g, ‘’);
+  container.innerHTML = `<div class="question-card" id="qcard"> <div class="q-meta"> <span class="q-tag topic-tag">${q.topic}</span> <span class="q-tag diff-tag ${q.difficulty?.toLowerCase()}">${q.difficulty}</span> </div> <div class="q-text">${q.question}</div> <div class="q-options" id="q-options"> ${q.options.map((opt, i) =>`
+  <button class="q-opt" onclick="selectAnswer(${i}, ${q.correct}, '${qId}', '${q.topic}')" id="opt-${i}">
+  <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+  <span class="opt-text">${opt.replace(/^[A-D].\s*/,’’)}</span>
+  </button>`).join('')} </div> <div class="q-explanation" id="q-exp" style="display:none"> <div class="exp-header">📖 Explanation</div> <div class="exp-body">${q.explanation}</div> ${q.pearl ? `<div class="exp-pearl">🎯 <strong>Exam Pearl:</strong> ${q.pearl}</div>` : ''} <div class="conf-section"> <div class="conf-label">How confident were you?</div> <div class="conf-btns"> <button class="conf-btn got" onclick="rateConfidence('got_it','${qId}',${container === document.getElementById('quiz-area')})">✅ Got it</button> <button class="conf-btn unsure" onclick="rateConfidence('unsure','${qId}',${container === document.getElementById('quiz-area')})">🤔 Unsure</button> <button class="conf-btn guessed" onclick="rateConfidence('guessed','${qId}',${container === document.getElementById('quiz-area')})">🎲 Guessed</button> </div> </div> <div class="q-actions"> <button class="btn-primary" onclick="generateQuiz()">Next Question ➤</button> <button class="btn-secondary" onclick="toggleBookmark('${q.question.replace(/'/g,"\\'")}','${q.topic}')">⭐ Bookmark</button> <button class="btn-secondary" onclick="teachMe('${q.topic}','${q.question.replace(/'/g,"\\'").substring(0,50)}')">📚 Teach Me</button> <button class="btn-secondary" onclick="getYouTube('${q.topic}')">▶️ Videos</button> </div> </div> </div>`;
+  window._currentQuestion = q;
+  window._currentCorrect = false;
+  };
+  
+  window.selectAnswer = (selected, correct, qId, topic) => {
+  const isCorrect = selected === correct;
+  window._currentCorrect = isCorrect;
+  document.querySelectorAll(’.q-opt’).forEach((btn, i) => {
+  btn.disabled = true;
+  if (i === correct) btn.classList.add(‘correct’);
+  else if (i === selected && !isCorrect) btn.classList.add(‘wrong’);
+  });
+  document.getElementById(‘q-exp’).style.display = ‘block’;
+  saveProgress(topic, isCorrect);
+  };
+  
+  window.rateConfidence = (conf, qId, inQuiz) => {
+  saveSRS(qId, window._currentCorrect, conf);
+  document.querySelectorAll(’.conf-btn’).forEach(b => b.style.opacity = ‘0.5’);
+  showToast(conf === ‘got_it’ ? ‘✅ Marked as known’ : conf === ‘unsure’ ? ‘🔄 Will review soon’ : ‘🎲 Will revisit shortly’);
+  };
+  
+  window.teachMe = async (topic, hint) => {
+  const area = document.getElementById(‘quiz-area’);
+  const existing = area.querySelector(’.teach-me-panel’);
+  if (existing) existing.remove();
+  const panel = document.createElement(‘div’);
+  panel.className = ‘teach-me-panel loading-card’;
+  panel.innerHTML = ‘<div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Loading explanation…</div>’;
+  area.appendChild(panel);
+  panel.scrollIntoView({ behavior: ‘smooth’ });
+  const resp = await callAI(`Give me a deep board-focused explanation of the concept tested in this question about "${hint}" in the topic "${topic}". Include all relevant cutoffs, formulas, and guideline references. Use HTML formatting.`);
+  panel.innerHTML = `<div class="teach-header">📚 Deep Dive: ${topic}</div><div class="teach-body">${resp}</div>`;
+  };
+  
+  window.getYouTube = async (topic) => {
+  const area = document.getElementById(‘quiz-area’);
+  const existing = area.querySelector(’.yt-panel’);
+  if (existing) { existing.remove(); return; }
+  const panel = document.createElement(‘div’);
+  panel.className = ‘yt-panel loading-card’;
+  panel.innerHTML = ‘<div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Finding videos…</div>’;
+  area.appendChild(panel);
+  
+  const resp = await callAI(`List 4 specific YouTube search queries to find the best educational videos about "${topic}" in echocardiography for board exam preparation. Also list these reliable echo YouTube channels: 123Sonography, ASE official, Mayo Clinic Cardiovascular, EchoNation. Format as JSON array: [{"title":"...","search":"...","channel":"..."}]`, ‘Respond ONLY with a JSON array, no other text.’);
+  let videos = [];
+  try {
+  const clean = resp.replace(/`json|`/g,’’).trim();
+  videos = JSON.parse(clean);
+  } catch(e) {
+  videos = [
+  { title: ‘123Sonography - Echo Education’, search: ’123sonography echocardiography ’ + topic, channel: ‘123Sonography’ },
+  { title: ‘ASE Guidelines Webinar’, search: ‘ASE echocardiography ’ + topic + ’ guidelines’, channel: ‘ASE Official’ },
+  { title: ‘Mayo Clinic Echo Teaching’, search: ’Mayo Clinic echo ’ + topic, channel: ‘Mayo Clinic CV’ },
+  { title: ’Board Review - ’ + topic, search: ’echocardiography board review ’ + topic, channel: ‘EchoNation’ }
+  ];
+  }
+  panel.className = ‘yt-panel’;
+  panel.innerHTML = `<div class="yt-header">▶️ Recommended Videos: ${topic}</div> <div class="yt-grid"> ${videos.map(v => `
+  <a class="yt-card" href="https://www.youtube.com/results?search_query=${encodeURIComponent(v.search)}" target="_blank">
+  <div class="yt-thumb">▶</div>
+  <div class="yt-info">
+  <div class="yt-title">${v.title}</div>
+  <div class="yt-channel">${v.channel}</div>
   </div>
-  <div class="yt-channels">
-    <div class="yt-ch-label">Top Echo Channels:</div>
-    ${[
-      { name: '123Sonography', url: 'https://www.youtube.com/@123sonography' },
-      { name: 'ASE Official', url: 'https://www.youtube.com/@ASEcho' },
-      { name: 'Mayo Clinic CV', url: 'https://www.youtube.com/@MayoClinic' },
-      { name: 'EchoNation', url: 'https://www.youtube.com/@echonation' },
-      { name: 'Dr. Jack Colman', url: 'https://www.youtube.com/results?search_query=jack+colman+echocardiography' }
-    ].map(c => `<a class="yt-ch-btn" href="${c.url}" target="_blank">${c.name}</a>`).join('')}
-  </div>`;
-```
-
-};
-
-// ── TUTOR MODE ──
-window.renderTutorUI = () => {
-const sc = document.getElementById(‘study-content’);
-sc.innerHTML = `<div class="tutor-wrap"> <div class="tutor-messages" id="tutor-msgs"> <div class="tutor-welcome"> <div class="tw-icon">🫀</div> <div class="tw-title">Echo Tutor</div> <div class="tw-sub">Ask me anything about echocardiography — concepts, guidelines, formulas, or comparisons.</div> <div class="tw-chips"> ${['Explain diastolic dysfunction grading ASE 2025 vs 2016','What changed in the 2025 Right Heart guidelines?','Severe AS criteria — all parameters','PISA method step by step','Physics: axial vs lateral resolution'].map(q =>`<button class="tw-chip" onclick="sendTutor('${q}')">${q}</button>`).join('')} </div> </div> </div> <div class="tutor-input-area"> <div class="tutor-input-row"> <textarea id="tutor-input" class="tutor-input" placeholder="Ask about any echo concept, guideline, or formula..." rows="1" onkeydown="tutorKey(event)" oninput="autoResize(this)"></textarea> <button class="send-btn" onclick="sendTutor()">➤</button> </div> <div class="input-hints"> <span class="hint-chip" onclick="insertTutorHint('Compare ASE 2016 vs 2025 guidelines for ')">⚖️ Compare guidelines</span> <span class="hint-chip" onclick="insertTutorHint('What are the normal values for ')">📋 Normal values</span> <span class="hint-chip" onclick="insertTutorHint('Explain the formula for ')">🧮 Formula</span> <span class="hint-chip" onclick="insertTutorHint('Give me a physics explanation of ')">〰️ Physics</span> </div> </div> </div>`;
-};
-
-window.sendTutor = async (preset) => {
-const input = document.getElementById(‘tutor-input’);
-const msg = preset || input?.value?.trim();
-if (!msg) return;
-if (input) { input.value = ‘’; autoResize(input); }
-
-```
-const msgs = document.getElementById('tutor-msgs');
-const welcome = msgs.querySelector('.tutor-welcome');
-if (welcome) welcome.remove();
-
-msgs.innerHTML += `<div class="tutor-msg user"><div class="msg-av user-av">DR</div><div class="msg-bub user-bub">${msg}</div></div>`;
-msgs.innerHTML += `<div class="tutor-msg ai" id="loading-tutor"><div class="msg-av ai-av">EP</div><div class="msg-bub ai-bub"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>`;
-msgs.scrollTop = msgs.scrollHeight;
-
-const resp = await callAI(msg);
-document.getElementById('loading-tutor')?.remove();
-msgs.innerHTML += `<div class="tutor-msg ai"><div class="msg-av ai-av">EP</div><div class="msg-bub ai-bub">${resp}</div></div>`;
-msgs.scrollTop = msgs.scrollHeight;
-```
-
-};
-
-window.tutorKey = (e) => { if (e.key === ‘Enter’ && !e.shiftKey) { e.preventDefault(); sendTutor(); } };
-window.insertTutorHint = (t) => { const i = document.getElementById(‘tutor-input’); if(i){i.value=t;i.focus();autoResize(i);} };
-
-// ── VIGNETTE MODE ──
-window.renderVignetteUI = () => {
-const sc = document.getElementById(‘study-content’);
-sc.innerHTML = ` <div class="vig-wrap"> <div class="vig-header"> <div class="vig-title">🫀 Clinical Vignette</div> <button class="btn-primary" onclick="generateVignette()">New Case</button> </div> <div id="vig-area"> <div class="vig-welcome"> <p>Clinical cases with echo findings, step-by-step reasoning, and teaching points.</p> <button class="btn-primary btn-lg" onclick="generateVignette()">Generate Case 🫀</button> </div> </div> </div>`;
-};
-
-window.generateVignette = async () => {
-const area = document.getElementById(‘vig-area’);
-area.innerHTML = `<div class="loading-card"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Generating clinical case...</div></div>`;
-const topic = APP.currentTopic === ‘all’ ? getSmartTopic() : APP.currentTopic;
-const prompt = `Create a clinical echocardiography vignette for board exam preparation on the topic: “${topic}”.
-Format using HTML:
+  </a>`).join('')} </div> <div class="yt-channels"> <div class="yt-ch-label">Top Echo Channels:</div> ${[ { name: '123Sonography', url: 'https://www.youtube.com/@123sonography' }, { name: 'ASE Official', url: 'https://www.youtube.com/@ASEcho' }, { name: 'Mayo Clinic CV', url: 'https://www.youtube.com/@MayoClinic' }, { name: 'EchoNation', url: 'https://www.youtube.com/@echonation' }, { name: 'Dr. Jack Colman', url: 'https://www.youtube.com/results?search_query=jack+colman+echocardiography' } ].map(c => `<a class="yt-ch-btn" href="${c.url}" target="_blank">${c.name}</a>`).join('')} </div>`;
+  };
+  
+  // ── TUTOR MODE ──
+  window.renderTutorUI = () => {
+  const sc = document.getElementById(‘study-content’);
+  sc.innerHTML = `<div class="tutor-wrap"> <div class="tutor-messages" id="tutor-msgs"> <div class="tutor-welcome"> <div class="tw-icon">🫀</div> <div class="tw-title">Echo Tutor</div> <div class="tw-sub">Ask me anything about echocardiography — concepts, guidelines, formulas, or comparisons.</div> <div class="tw-chips"> ${['Explain diastolic dysfunction grading ASE 2025 vs 2016','What changed in the 2025 Right Heart guidelines?','Severe AS criteria — all parameters','PISA method step by step','Physics: axial vs lateral resolution'].map(q =>`<button class="tw-chip" onclick="sendTutor('${q}')">${q}</button>`).join('')} </div> </div> </div> <div class="tutor-input-area"> <div class="tutor-input-row"> <textarea id="tutor-input" class="tutor-input" placeholder="Ask about any echo concept, guideline, or formula..." rows="1" onkeydown="tutorKey(event)" oninput="autoResize(this)"></textarea> <button class="send-btn" onclick="sendTutor()">➤</button> </div> <div class="input-hints"> <span class="hint-chip" onclick="insertTutorHint('Compare ASE 2016 vs 2025 guidelines for ')">⚖️ Compare guidelines</span> <span class="hint-chip" onclick="insertTutorHint('What are the normal values for ')">📋 Normal values</span> <span class="hint-chip" onclick="insertTutorHint('Explain the formula for ')">🧮 Formula</span> <span class="hint-chip" onclick="insertTutorHint('Give me a physics explanation of ')">〰️ Physics</span> </div> </div> </div>`;
+  };
+  
+  window.sendTutor = async (preset) => {
+  const input = document.getElementById(‘tutor-input’);
+  const msg = preset || input?.value?.trim();
+  if (!msg) return;
+  if (input) { input.value = ‘’; autoResize(input); }
+  
+  const msgs = document.getElementById(‘tutor-msgs’);
+  const welcome = msgs.querySelector(’.tutor-welcome’);
+  if (welcome) welcome.remove();
+  
+  msgs.innerHTML += `<div class="tutor-msg user"><div class="msg-av user-av">DR</div><div class="msg-bub user-bub">${msg}</div></div>`;
+  msgs.innerHTML += `<div class="tutor-msg ai" id="loading-tutor"><div class="msg-av ai-av">EP</div><div class="msg-bub ai-bub"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  
+  const resp = await callAI(msg);
+  document.getElementById(‘loading-tutor’)?.remove();
+  msgs.innerHTML += `<div class="tutor-msg ai"><div class="msg-av ai-av">EP</div><div class="msg-bub ai-bub">${resp}</div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  };
+  
+  window.tutorKey = (e) => { if (e.key === ‘Enter’ && !e.shiftKey) { e.preventDefault(); sendTutor(); } };
+  window.insertTutorHint = (t) => { const i = document.getElementById(‘tutor-input’); if(i){i.value=t;i.focus();autoResize(i);} };
+  
+  // ── VIGNETTE MODE ──
+  window.renderVignetteUI = () => {
+  const sc = document.getElementById(‘study-content’);
+  sc.innerHTML = ` <div class="vig-wrap"> <div class="vig-header"> <div class="vig-title">🫀 Clinical Vignette</div> <button class="btn-primary" onclick="generateVignette()">New Case</button> </div> <div id="vig-area"> <div class="vig-welcome"> <p>Clinical cases with echo findings, step-by-step reasoning, and teaching points.</p> <button class="btn-primary btn-lg" onclick="generateVignette()">Generate Case 🫀</button> </div> </div> </div>`;
+  };
+  
+  window.generateVignette = async () => {
+  const area = document.getElementById(‘vig-area’);
+  area.innerHTML = `<div class="loading-card"><div class="loading-dots"><span></span><span></span><span></span></div><div class="loading-text">Generating clinical case...</div></div>`;
+  const topic = APP.currentTopic === ‘all’ ? getSmartTopic() : APP.currentTopic;
+  const prompt = `Create a clinical echocardiography vignette for board exam preparation on the topic: “${topic}”.
+  Format using HTML:
 
 <div class="case-section"><h4>🏥 Clinical Presentation</h4>...2-3 sentence patient history...</div>
 <div class="case-section"><h4>📊 Echo Findings</h4>...specific echo measurements and findings...</div>
