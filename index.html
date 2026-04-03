@@ -47,15 +47,22 @@ streak: { count: 0, lastDate: null },
 settings: { darkMode: true, fontSize: ‘medium’, examDate: ‘2026-07-01’ }
 };
 
-// ── AUTH STATE ──
+// ── AUTH STATE ── (temporary: skip login for testing)
 onAuthStateChanged(auth, async (user) => {
 if (user) {
 APP.user = user;
 await loadUserData();
 showApp();
 } else {
-APP.user = null;
-showAuth();
+// Auto sign in anonymously for testing — no login required
+APP.user = { uid: ‘guest-ahmed’, email: ‘guest@echoprep.app’ };
+document.getElementById(‘user-name-display’).textContent = ‘Ahmed’;
+APP.progressData = JSON.parse(localStorage.getItem(‘ep_progress’) || ‘{}’);
+APP.srsData = JSON.parse(localStorage.getItem(‘ep_srs’) || ‘{}’);
+APP.bookmarks = JSON.parse(localStorage.getItem(‘ep_bookmarks’) || ‘[]’);
+APP.streak = JSON.parse(localStorage.getItem(‘ep_streak’) || ‘{“count”:0,“lastDate”:null}’);
+updateStreak();
+showApp();
 }
 });
 
