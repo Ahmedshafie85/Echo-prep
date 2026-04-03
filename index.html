@@ -362,8 +362,8 @@ body{font-family:var(--fn);font-size:15px;background:var(--bg);color:var(--tx)}
 </div>
 <div id="toast" class="toast"></div>
 <script>
-const GK='AIzaSyDkptc7fZeUk52WMAKs07noN5jRypejf6o';
-const GU='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GK;
+const GROQ_KEY='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';
+const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
 firebase.initializeApp({apiKey:"AIzaSyAt8jyv7YVGLHuCKREoMgZintE6HSlZCjA",authDomain:"echo-prep.firebaseapp.com",projectId:"echo-prep",storageBucket:"echo-prep.firebasestorage.app",messagingSenderId:"868860955040",appId:"1:868860955040:web:a8d7a28d7ea9b90d6dbcc5"});
 const db=firebase.firestore();const storage=firebase.storage();
 const A={ct:'all',sm:'quiz',ch:[],qs:{c:0,t:0},ed:new Date('2026-07-01'),pr:{},srs:{},bm:[],streak:{count:0,lastDate:null},rc:null,mx:{qs:[],as:[],cur:0,tot:20,st:null},mt:null};
@@ -482,15 +482,48 @@ function resetProgress(){if(confirm('Reset all progress?')){A.pr={};A.srs={};sav
 function setFS(sz){document.documentElement.style.fontSize=sz+'px';toast('Font size updated');}
 function savePr(t,ok){if(!A.pr[t])A.pr[t]={a:0,c:0};A.pr[t].a++;if(ok)A.pr[t].c++;A.qs.t++;if(ok)A.qs.c++;saveLocal();renderSB();const e=document.getElementById('qscore');if(e)e.textContent='Score: '+A.qs.c+'/'+A.qs.t;}
 function saveSRS(id,ok,conf){const ex=A.srs[id]||{iv:1,ef:2.5,rp:0};let{iv,ef,rp}=ex;if(ok&&conf==='got_it'){rp++;iv=rp===1?1:rp===2?3:Math.round(iv*ef);ef=Math.min(3,ef+.1);}else if(ok){iv=Math.max(1,Math.round(iv*.8));}else{rp=0;iv=1;ef=Math.max(1.3,ef-.2);}A.srs[id]={iv,ef,rp,nr:Date.now()+iv*86400000};saveLocal();}
-async function callAI(msg,extra=''){A.ch.push({role:'user',parts:[{text:msg}]});if(A.ch.length>16)A.ch=A.ch.slice(-16);try{const r=await fetch(GU,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS+(extra?' '+extra:'')}]},contents:A.ch,generationConfig:{maxOutputTokens:1500,temperature:.7}})});const d=await r.json();const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'Error. Try again.';A.ch.push({role:'model',parts:[{text:reply}]});return reply;}catch(e){return'Network error. Check connection.';}}
-async function callQAI(topic,diff){const w=getWeak();const pr='You are an expert ASCeXAM echocardiography board exam question writer. '+(w.length?'Weak areas: '+w.join(', ')+'. ':'')+'Generate ONE '+(diff||'medium')+' difficulty MCQ on: "'+topic+'". Physics: give extra detail. Base on ASE guidelines, Klein, Pai 500 MCQs. RESPOND ONLY WITH VALID JSON - no markdown, no backticks, no extra text: {"question":"...","options":["A. ...","B. ...","C. ...","D. ..."],"correct":0,"explanation":"...with guideline...","topic":"'+topic+'","difficulty":"'+(diff||'Medium')+'","pearl":"...exam pearl..."}';try{const r=await fetch(GU,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:pr}]}],generationConfig:{maxOutputTokens:1000,temperature:.8}})});const d=await r.json();console.log('Gemini response:',d);if(d.error){console.error('Gemini error:',d.error);return null;}let t=d.candidates?.[0]?.content?.parts?.[0]?.text||'{}';t=t.replace(/```json|```/g,'').trim();const p=JSON.parse(t);if(!p.question||!p.options)return null;return p;}catch(e){console.error('callQAI error:',e);return null;}}
+async function callAI(msg,extra=''){
+  A.ch.push({role:'user',content:msg});
+  if(A.ch.length>16)A.ch=A.ch.slice(-16);
+  try{
+    var messages=[{role:'system',content:SYS+(extra?' '+extra:'')}].concat(A.ch);
+    var r=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:messages,max_tokens:1500,temperature:0.7})});
+    var d=await r.json();
+    if(d.error){console.error('Groq error:',d.error);return 'Error: '+d.error.message;}
+    var reply=d.choices?.[0]?.message?.content||'Error. Try again.';
+    A.ch.push({role:'assistant',content:reply});
+    return reply;
+  }catch(e){console.error('callAI error:',e);return'Network error.';}
+}
+
+async function callQAI(topic,diff){
+var w=getWeak();
+var pr=‘You are an expert ASCeXAM echocardiography board exam question writer. ‘+
+(w.length?‘Weak areas: ‘+w.join(’, ‘)+’. ‘:’’)+
+‘Generate ONE ‘+(diff||‘medium’)+’ difficulty MCQ on: “’+topic+’”. ‘+
+‘Physics questions need extra detail. Base on ASE guidelines, Klein Echo Review, Pai 500 MCQs. ‘+
+‘RESPOND ONLY WITH VALID JSON, no markdown, no backticks: ‘+
+‘{“question”:”…”,“options”:[“A. …”,“B. …”,“C. …”,“D. …”],“correct”:0,“explanation”:”…with guideline…”,“topic”:”’+topic+’”,“difficulty”:”’+(diff||‘Medium’)+’”,“pearl”:”…exam pearl…”}’;
+try{
+var r=await fetch(GROQ_URL,{method:‘POST’,headers:{‘Content-Type’:‘application/json’,‘Authorization’:‘Bearer ‘+GROQ_KEY},body:JSON.stringify({model:‘llama-3.3-70b-versatile’,messages:[{role:‘system’,content:‘You are an expert echocardiography board exam question writer. Output ONLY valid JSON, no markdown, no backticks, no extra text.’},{role:‘user’,content:pr}],max_tokens:1000,temperature:0.8})});
+var d=await r.json();
+console.log(‘Quiz response:’,d);
+if(d.error){console.error(‘Quiz error:’,d.error);return null;}
+var t=d.choices?.[0]?.message?.content||’{}’;
+t=t.replace(/`json|`/g,’’).trim();
+var p=JSON.parse(t);
+if(!p.question||!p.options)return null;
+return p;
+}catch(e){console.error(‘callQAI error:’,e);return null;}
+}
 let isL=true;
-function toggleAuth(){isL=!isL;document.getElementById('nwrap').style.display=isL?'none':'block';document.getElementById('abtn').textContent=isL?'Sign In':'Create Account';document.getElementById('atog').innerHTML=isL?'New user? <a onclick="toggleAuth()">Create account</a>':'Have account? <a onclick="toggleAuth()">Sign in</a>';}
-async function doAuth(){const e=document.getElementById('aemail').value;const p=document.getElementById('apass').value;const err=document.getElementById('aerr');err.textContent='';try{if(isL)await firebase.auth().signInWithEmailAndPassword(e,p);else await firebase.auth().createUserWithEmailAndPassword(e,p);document.getElementById('auth').style.display='none';document.getElementById('app').style.display='flex';}catch(ex){err.textContent=ex.message.replace('Firebase: ','');}}
-function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
-function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.className='toast',2500);}
-function ldg(txt=''){return`<div class="ldc"><div class="dots"><span></span><span></span><span></span></div>${txt?'<div class="ldtxt">'+txt+'</div>':''}</div>`;}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toggleAuth(){isL=!isL;document.getElementById(‘nwrap’).style.display=isL?‘none’:‘block’;document.getElementById(‘abtn’).textContent=isL?‘Sign In’:‘Create Account’;document.getElementById(‘atog’).innerHTML=isL?‘New user? <a onclick="toggleAuth()">Create account</a>’:‘Have account? <a onclick="toggleAuth()">Sign in</a>’;}
+async function doAuth(){const e=document.getElementById(‘aemail’).value;const p=document.getElementById(‘apass’).value;const err=document.getElementById(‘aerr’);err.textContent=’’;try{if(isL)await firebase.auth().signInWithEmailAndPassword(e,p);else await firebase.auth().createUserWithEmailAndPassword(e,p);document.getElementById(‘auth’).style.display=‘none’;document.getElementById(‘app’).style.display=‘flex’;}catch(ex){err.textContent=ex.message.replace(‘Firebase: ‘,’’);}}
+function ar(el){el.style.height=‘auto’;el.style.height=Math.min(el.scrollHeight,100)+‘px’;}
+function toast(msg,type=’’){const t=document.getElementById(‘toast’);t.textContent=msg;t.className=‘toast show’+(type?’ ‘+type:’’);setTimeout(()=>t.className=‘toast’,2500);}
+function ldg(txt=’’){return`<div class="ldc"><div class="dots"><span></span><span></span><span></span></div>${txt?'<div class="ldtxt">'+txt+'</div>':''}</div>`;}
+function esc(s){return s.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’);}
 </script>
+
 </body>
 </html>
