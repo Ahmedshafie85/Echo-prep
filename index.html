@@ -510,8 +510,14 @@ navigateTo(‘dashboard’);
 }
 
 function showAuth() {
-document.getElementById(‘auth-screen’).style.display = ‘flex’;
-document.getElementById(‘app-screen’).style.display = ‘none’;
+// Temporarily bypassed — no login required
+APP.user = { uid: ‘guest-ahmed’, email: ‘guest@echoprep.app’ };
+document.getElementById(‘user-name-display’).textContent = ‘Ahmed’;
+APP.progressData = JSON.parse(localStorage.getItem(‘ep_progress’) || ‘{}’);
+APP.srsData = JSON.parse(localStorage.getItem(‘ep_srs’) || ‘{}’);
+APP.bookmarks = JSON.parse(localStorage.getItem(‘ep_bookmarks’) || ‘[]’);
+APP.streak = JSON.parse(localStorage.getItem(‘ep_streak’) || ‘{“count”:0,“lastDate”:null}’);
+showApp();
 }
 
 window.renderSidebar = () => {
