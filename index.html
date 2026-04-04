@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="manifest" href="manifest.json">
@@ -36,12 +34,9 @@
   --fnm: "JetBrains Mono", monospace;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-- { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
-  body { font-family: var(–fn); font-size: 15px; background: var(–bg); color: var(–tx); line-height: 1.5; }
-
+}	∙	{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(–fn); font-size: 15px; background: var(–bg); color: var(–tx); line-height: 1.5; }
 /* Authentication Screen */
 #auth { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; background: radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.15), transparent 60%), var(–bg); }
 .abox { background: var(–sf); border: 1px solid var(–bd); border-radius: 20px; padding: 40px; width: 100%; max-width: 380px; box-shadow: var(–shadow-hover); }
@@ -58,7 +53,6 @@
 .abtn:active { transform: scale(0.98); }
 .atog { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(–tx3); }
 .atog a { color: var(–ac); cursor: pointer; font-weight: 500; }
-
 /* Main App Layout */
 #app { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; }
 .hdr { height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(–sf); border-bottom: 1px solid var(–bd); z-index: 50; }
@@ -70,7 +64,6 @@
 .ham { background: none; border: none; color: var(–tx2); font-size: 1.2rem; cursor: pointer; padding: 4px; transition: color 0.2s; }
 .ham:hover { color: var(–tx); }
 .body { flex: 1; display: flex; overflow: hidden; background: var(–bg); }
-
 /* Sidebar */
 #sb { width: 240px; flex-shrink: 0; background: var(–sf); border-right: 1px solid var(–bd); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .nwrap { padding: 16px 12px 8px; }
@@ -88,14 +81,12 @@
 .tic { font-size: 0.9rem; width: 20px; flex-shrink: 0; }
 .tlbl { flex: 1; }
 .tacc { font-family: var(–fnm); font-size: 0.65rem; flex-shrink: 0; font-weight: 600; }
-
 /* Main Content Area */
 .mc { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 .pg { flex: 1; overflow-y: auto; flex-direction: column; padding: 24px 32px; gap: 20px; display: none; }
 .pg::-webkit-scrollbar { width: 6px; }
 .pg::-webkit-scrollbar-thumb { background: var(–sf3); border-radius: 3px; }
 #pg-dash { display: flex; }
-
 /* Dashboard Grids & Cards */
 .sgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 8px; }
 .sc, .dc, .pearl, .qcard, .tpanel, .ytpanel, .msetup, .rcard, .bmc, .uc, .ldc { background: var(–sf); border: 1px solid var(–bd); border-radius: 14px; padding: 24px; box-shadow: var(–shadow); transition: transform 0.2s, box-shadow 0.2s; }
@@ -105,25 +96,20 @@
 .sl { font-size: 0.75rem; color: var(–tx3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 .ecd { font-family: var(–fnm); font-size: 2rem; color: var(–wn); font-weight: 600; }
 .ecl { font-size: 0.75rem; color: var(–tx3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-
 /* Daily Reminder Banner */
 .dbanner { background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15)); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }
 .db-txt { font-weight: 500; font-size: 0.95rem; }
 .db-tgt { background: var(–ac); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
-
 /* Pearl of the Day */
 .pearl { background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(139,92,246,0.05)); border: 1px solid rgba(59,130,246,0.2); }
 .plbl { font-family: var(–fnm); font-size: 0.65rem; letter-spacing: 2px; color: var(–ac); text-transform: uppercase; margin-bottom: 10px; font-weight: 600; }
 .ptxt { font-family: var(–fns); font-size: 1.15rem; color: var(–tx); line-height: 1.6; }
-
 .drow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .dct { font-size: 0.9rem; color: var(–tx); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-
 /* Progress Heatmap */
 .heatmap { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; margin-top: 12px; }
 .hm-box { aspect-ratio: 1; border-radius: 4px; background: var(–bg); border: 1px solid var(–bd); }
 .hm-box.active { background: var(–ok); border-color: rgba(16,185,129,0.5); box-shadow: 0 0 8px rgba(16,185,129,0.3); }
-
 /* Weak Topics List */
 .wi { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s; margin-bottom: 6px; }
 .wi:hover { background: var(–sf2); }
@@ -134,77 +120,61 @@
 .wb { height: 100%; background: var(–dg); border-radius: 2px; }
 .wpct { font-family: var(–fnm); font-size: 0.8rem; font-weight: 600; }
 .sbdg { display: inline-flex; align-items: center; gap: 4px; font-family: var(–fnm); font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(–wn); }
-
 /* Quick Actions */
 .qagrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .qabtn { padding: 12px 16px; border-radius: 10px; border: 1px solid var(–bd); background: var(–bg); color: var(–tx2); font-family: var(–fn); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left; }
 .qabtn:hover { border-color: var(–ac); color: var(–ac); transform: translateY(-1px); box-shadow: var(–shadow); }
-
 /* Study Tabs */
 #pg-study { padding: 0; }
 .stabs { display: flex; gap: 8px; padding: 12px 24px; border-bottom: 1px solid var(–bd); background: var(–sf); flex-shrink: 0; align-items: center; flex-wrap: wrap; }
 .mtab { padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(–tx3); font-family: var(–fn); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .mtab:hover { color: var(–tx2); }
 .mtab.active { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: var(–ac); font-weight: 600; }
-
 #sc { flex: 1; overflow-y: auto; padding: 24px 32px; }
 #sc::-webkit-scrollbar { width: 6px; }
 #sc::-webkit-scrollbar-thumb { background: var(–sf3); border-radius: 3px; }
-
 /* Questions & Exams */
 .qhdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
 .qtl { font-size: 1rem; color: var(–tx); font-weight: 600; }
 .qsl { font-family: var(–fnm); font-size: 0.8rem; color: var(–tx3); margin-top: 4px; }
 .dsel { background: var(–bg); border: 1px solid var(–bd); color: var(–tx2); padding: 8px 12px; border-radius: 8px; font-family: var(–fn); font-size: 0.85rem; outline: none; cursor: pointer; }
-
 /* Timer Bar */
 .tbar-wrap { height: 6px; background: var(–bg); border-radius: 3px; margin-bottom: 16px; overflow: hidden; display: none; }
 .tbar-fill { height: 100%; background: var(–wn); width: 100%; transition: width 1s linear, background 0.3s; }
-
 .qcard { animation: fu 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes fu { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
 .qmeta { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .qtg { font-family: var(–fnm); font-size: 0.65rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 .ttg { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: var(–ac); }
 .dtg { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(–wn); }
 .dtg.hard { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: var(–dg); }
 .dtg.easy { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: var(–ok); }
-
 .qtxt { font-family: var(–fns); font-size: 1.25rem; line-height: 1.6; color: var(–tx); margin-bottom: 24px; font-weight: 400; }
-
 .qopts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 .qopt { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px; border: 1px solid var(–bd); background: var(–bg); color: var(–tx2); font-family: var(–fn); font-size: 0.95rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); text-align: left; }
 .qopt:hover:not(:disabled) { border-color: var(–ac); color: var(–tx); transform: translateY(-2px); box-shadow: var(–shadow); }
 .qopt.ok { border-color: var(–ok); background: rgba(16,185,129,0.1); color: var(–ok); box-shadow: 0 0 15px rgba(16,185,129,0.15); font-weight: 500; }
 .qopt.no { border-color: var(–dg); background: rgba(239,68,68,0.1); color: var(–dg); }
 .qopt:disabled { cursor: default; }
-
 .oltr { width: 28px; height: 28px; border-radius: 6px; background: var(–sf3); display: flex; align-items: center; justify-content: center; font-family: var(–fnm); font-size: 0.8rem; font-weight: 600; flex-shrink: 0; color: var(–tx); }
-
 .qexp { background: var(–bg); border: 1px solid var(–bd); border-left: 4px solid var(–ok); border-radius: 10px; padding: 20px; margin-top: 16px; animation: fu 0.4s ease; }
 .exhdr { font-weight: 600; color: var(–ok); font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 .exbdy { font-size: 0.95rem; line-height: 1.7; color: var(–tx2); }
 .exprl { margin-top: 16px; padding: 12px 16px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; font-size: 0.9rem; color: var(–wn); line-height: 1.5; }
-
 /* Personal Notes Area */
 .pnotes { margin-top: 16px; padding: 16px; background: var(–sf); border: 1px dashed var(–bd); border-radius: 10px; }
 .pn-ta { width: 100%; background: var(–bg); border: 1px solid var(–bd); color: var(–tx); border-radius: 8px; padding: 10px; font-family: var(–fn); font-size: 0.9rem; resize: vertical; min-height: 80px; margin-top: 8px; outline: none; }
 .pn-ta:focus { border-color: var(–ac); }
-
 .cfwrap { margin-top: 20px; border-top: 1px solid var(–bd); padding-top: 16px; }
 .cflbl { font-size: 0.8rem; color: var(–tx3); margin-bottom: 10px; font-weight: 500; }
 .cfbtns { display: flex; gap: 8px; flex-wrap: wrap; }
 .cfbtn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(–bd); background: var(–sf); color: var(–tx2); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .cfbtn:hover { border-color: var(–ac); color: var(–ac); transform: translateY(-1px); }
-
 .qacts { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-
 /* Panels & Video integration */
 .tpanel, .ytpanel { margin-top: 16px; animation: fu 0.4s ease; }
 .tphdr, .ythdr { font-weight: 600; color: var(–ac2); margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
 .tpbdy { font-size: 0.95rem; line-height: 1.7; color: var(–tx2); }
-
 .ytgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .ytcard { display: flex; gap: 12px; padding: 12px; background: var(–bg); border: 1px solid var(–bd); border-radius: 10px; text-decoration: none; transition: all 0.2s; }
 .ytcard:hover { border-color: var(–dg); transform: translateY(-2px); box-shadow: var(–shadow); }
@@ -215,7 +185,6 @@
 .ytchlbl { font-size: 0.8rem; color: var(–tx3); font-weight: 500; }
 .ytchbtn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(–bd); background: var(–bg); color: var(–tx2); font-size: 0.75rem; text-decoration: none; transition: all 0.2s; font-weight: 500; }
 .ytchbtn:hover { border-color: var(–dg); color: var(–dg); }
-
 /* Tutor Chat Interface */
 .twrap2 { display: flex; flex-direction: column; height: calc(100vh - 150px); }
 .tmsgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding-bottom: 12px; }
@@ -228,7 +197,6 @@
 .twchips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 600px; margin: 0 auto; }
 .twchip { padding: 8px 16px; border-radius: 20px; border: 1px solid var(–bd); background: var(–bg); color: var(–tx2); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
 .twchip:hover { border-color: var(–ac); color: var(–ac); transform: translateY(-1px); }
-
 .tmsg { display: flex; gap: 12px; animation: fu 0.3s ease; }
 .tmsg.u { flex-direction: row-reverse; }
 .mav { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(–fnm); font-size: 0.7rem; font-weight: 600; flex-shrink: 0; }
@@ -242,7 +210,6 @@
 .mbub strong { color: var(–tx); font-weight: 600; }
 .mbub ul, .mbub ol { padding-left: 20px; margin: 8px 0; }
 .mbub li { margin-bottom: 4px; }
-
 .tinput { padding-top: 16px; border-top: 1px solid var(–bd); flex-shrink: 0; }
 .trow { display: flex; gap: 10px; align-items: flex-end; background: var(–bg); border: 1px solid var(–bd); border-radius: 12px; padding: 10px 14px; transition: border-color 0.2s, box-shadow 0.2s; }
 .trow:focus-within { border-color: var(–ac); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
@@ -251,14 +218,12 @@
 .hints { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .hint { font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; border: 1px solid var(–bd); background: var(–bg); color: var(–tx3); cursor: pointer; transition: all 0.2s; font-weight: 500; }
 .hint:hover { border-color: var(–ac2); color: var(–ac2); }
-
 /* Vignettes */
 .vwrap { display: flex; flex-direction: column; gap: 16px; }
 .vhdr { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(–bd); }
 .vtitle { font-family: var(–fns); font-size: 1.3rem; font-weight: 600; }
 .vcard { font-size: 0.95rem; line-height: 1.7; color: var(–tx2); }
 .cans { background: var(–bg); border: 1px solid var(–bd); border-left: 4px solid var(–ok); border-radius: 8px; padding: 16px; margin-top: 16px; animation: fu 0.4s ease; }
-
 /* Buttons General */
 .bp { font-family: var(–fn); font-size: 0.85rem; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: none; background: var(–ac); color: #fff; cursor: pointer; transition: all 0.2s; }
 .bp:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
@@ -271,7 +236,6 @@
 .bdanger:hover { background: rgba(239,68,68,0.15); }
 .sbtn { width: 36px; height: 36px; border-radius: 8px; border: none; background: var(–ac); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 1rem; }
 .sbtn:hover { background: #2563eb; transform: scale(1.05); }
-
 /* Mock Exam specific */
 .mtitle { font-family: var(–fns); font-size: 1.6rem; margin-bottom: 8px; color: var(–tx); }
 .msub { color: var(–tx3); font-size: 0.9rem; margin-bottom: 24px; }
@@ -285,7 +249,6 @@
 .rfw { margin-bottom: 24px; }
 .rfp { font-family: var(–fnm); font-size: 3.5rem; font-weight: 600; }
 .rfl { font-size: 0.9rem; color: var(–tx2); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
-
 /* Reference Cards & Tables */
 .rgrid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 .rcard h3 { font-family: var(–fns); font-size: 1.1rem; color: var(–tx); margin-bottom: 16px; font-weight: 600; padding-bottom: 12px; border-bottom: 1px solid var(–bd); }
@@ -299,7 +262,6 @@
 .ci { padding: 12px; border-radius: 10px; background: var(–bg); }
 .civ { font-size: 1rem; }
 .cil { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-
 /* Various Utils */
 .ldc { padding: 32px; gap: 12px; }
 .ldtxt { font-size: 0.9rem; font-weight: 500; }
@@ -307,11 +269,9 @@
 .empty { padding: 48px; font-size: 0.95rem; }
 .toast { bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: fixed; opacity: 0; pointer-events: none; transition: opacity 0.3s; background: var(–sf); color: var(–tx); z-index: 1000; border: 1px solid var(–bd); }
 .toast.show { opacity: 1; }
-
 .gtag { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
 .vbox { background: var(–bg); border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
 .vbox-title { font-size: 0.7rem; margin-bottom: 8px; font-weight: 600; }
-
 /* Floating Action Button (Formula Sheet) */
 .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 28px; background: var(–ac2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(139,92,246,0.4); cursor: pointer; z-index: 90; transition: transform 0.2s; border: none; }
 .fab:hover { transform: scale(1.1); }
@@ -321,7 +281,6 @@
 .fab-table { width: 100%; text-align: left; border-collapse: collapse; margin-top: 16px; font-size: 0.9rem; }
 .fab-table th { padding: 8px; color: var(–ac); border-bottom: 1px solid var(–bd); font-weight: 600; }
 .fab-table td { padding: 10px 8px; border-bottom: 1px dashed var(–sf3); color: var(–tx2); }
-
 @media(max-width: 768px) {
 #sb { position: absolute; left: -240px; top: 56px; bottom: 0; z-index: 30; box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
 #sb.open { left: 0; }
@@ -333,7 +292,6 @@
 .dbanner { flex-direction: column; align-items: flex-start; }
 }
 </style>
-
 </head>
 <body>
 <div id="auth" style="display:none">
@@ -347,9 +305,7 @@
     <button class="abtn" id="abtn" onclick="doAuth()">Sign In</button>
     <div class="atog" id="atog">New user? <a onclick="toggleAuth()">Create account</a></div>
   </div>
-</div>
-
-<div id="app">
+</div><div id="app">
   <div class="hdr">
     <div style="display:flex;align-items:center;gap:10px">
       <button class="ham" onclick="toggleSB()">&#9776;</button>
@@ -378,7 +334,6 @@
     </div>
     <div class="mc">
 
-```
   <div class="pg" id="pg-dash" style="display:flex">
     <div class="dbanner">
       <div>
@@ -472,13 +427,10 @@
   <div class="pg" id="pg-lib" style="display:none"><div id="libcon"></div></div>
   <div class="pg" id="pg-set" style="display:none"><div id="setcon"></div></div>
 </div>
-```
 
-  </div>
+
 </div>
-
-<button class="fab" onclick="document.getElementById('fab-modal').style.display='flex'">🧮</button>
-
+</div><button class="fab" onclick="document.getElementById('fab-modal').style.display='flex'">🧮</button>
 <div id="fab-modal" class="fab-modal" onclick="if(event.target===this)this.style.display='none'">
   <div class="fab-content">
     <button class="fab-close" onclick="document.getElementById('fab-modal').style.display='none'">✖</button>
@@ -494,11 +446,7 @@
       <tr><td>RVSP</td><td>4(TR Vmax)² + RAP</td></tr>
     </table>
   </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<script>
+</div><div id="toast" class="toast"></div><script>
 const GROQ_KEY='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';
 const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
 
@@ -773,7 +721,6 @@ function renderQ(q,c){
         <div style="font-size:0.8rem;color:var(--tx2)">📝 My Notes / Mnemonics</div>
         <textarea class="pn-ta" placeholder="Type personal mnemonics here..." onblur="saveNote('${q.topic}', this.value)">${noteTxt}</textarea>
 
-```
   </div>
   <div class="cfwrap">
     <div class="cflbl">How confident were you?</div>
@@ -786,12 +733,10 @@ function renderQ(q,c){
     <button class="bs" onclick="showYT('${q.topic}')">▶️ Videos</button>
   </div>
 </div>
-```
 
-  </div></div>`;
-}
 
-function pickA(s,correct,topic){
+</div></div>`;
+}function pickA(s,correct,topic){
 clearInterval(A.tInt);
 const ok=s===correct;window._lc=ok;
 for(let i=0;i<4;i++){
@@ -804,66 +749,38 @@ else if(i===s&&!ok)b.classList.add(‘no’);
 document.getElementById(‘qexp’).style.display=‘block’;
 savePr(topic,ok);
 }
-
 function saveNote(topic, text) {
 A.notes[topic] = text;
 saveLocal();
 toast(‘Notes saved’);
 }
-
 function rateC(c){saveSRS(‘q_’+Date.now(),window._lc||false,c);toast(c===‘got_it’?‘✅ Known’:c===‘unsure’?‘🔄 Review soon’:‘🎲 Revisit’);}
-
-async function teachMe(topic,hint){const qa=document.getElementById(‘qa’);const old=qa.querySelector(’.tpanel’);if(old)old.remove();const p=document.createElement(‘div’);p.className=‘tpanel’;p.innerHTML=ldg(‘Loading explanation…’);qa.appendChild(p);p.scrollIntoView({behavior:‘smooth’});const r=await callAI(`Deep board explanation of "${hint}" (topic:${topic}). Include cutoffs, formulas, guideline versions. Use HTML h3/h4/strong/ul/table tags.`);p.innerHTML=`<div class="tphdr">📚 Deep Dive: ${topic}</div><div class="tpbdy">${r}</div>`;}
-
-async function showYT(topic){const qa=document.getElementById(‘qa’);const old=qa.querySelector(’.ytpanel’);if(old){old.remove();return;}const p=document.createElement(‘div’);p.className=‘ytpanel’;p.innerHTML=ldg(‘Finding videos…’);qa.appendChild(p);const chs=[{n:‘123Sonography’,u:‘https://www.youtube.com/@123sonography’},{n:‘ASE Official’,u:‘https://www.youtube.com/@ASEcho’},{n:‘Mayo Clinic CV’,u:‘https://www.youtube.com/@MayoClinic’},{n:‘EchoNation’,u:‘https://www.youtube.com/results?search_query=echonation+echo’},{n:‘Dr. Jack Colman’,u:‘https://www.youtube.com/results?search_query=jack+colman+echocardiography’}];p.innerHTML=`<div class="ythdr">▶️ Videos: ${topic}</div><div class="ytgrid">${chs.slice(0,4).map(c=>`<a class="ytcard" href="https://www.youtube.com/results?search_query=${encodeURIComponent(c.n+' echocardiography '+topic)}" target="_blank"><div class="ytthumb">▶</div><div><div class="yttitle">${c.n}</div><div class="ytch">${topic}</div></div></a>`).join('')}</div><div class="ytchs"><span class="ytchlbl">Channels:</span>${chs.map(c=>`<a class="ytchbtn" href="${c.u}" target="_blank">${c.n}</a>`).join('')}</div>`;}
-
-function renderTUI(sc){sc.innerHTML=`<div class="twrap2"><div class="tmsgs" id="tmsgs"><div class="twelcome"><div class="twicon">🫀</div><div class="twtitle">Echo Tutor</div><div class="twsub">Ask me anything — concepts, guidelines, formulas.</div><div class="twchips">${['Diastolic dysfunction grading ASE 2025 vs 2016','What changed in 2025 Right Heart guidelines?','Severe AS — all criteria','PISA method step by step','Physics: axial vs lateral resolution'].map(q=>`<button class="twchip" onclick="sendT(${JSON.stringify(q)})">${q}</button>`).join('')}</div></div></div><div class="tinput"><div class="trow"><textarea class="tta" id="tta" rows="1" placeholder="Ask about any echo concept..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendT();}" oninput="ar(this)"></textarea><button class="sbtn" onclick="sendT()">➤</button></div><div class="hints"><span class="hint" onclick="ih('Compare ASE 2016 vs 2025 for ')">⚖️ Compare</span><span class="hint" onclick="ih('Normal values for ')">📋 Normal values</span><span class="hint" onclick="ih('Formula for ')">🧮 Formula</span><span class="hint" onclick="ih('Physics explanation of ')">〰️ Physics</span></div></div></div>`;}
-
-async function sendT(pre){const ta=document.getElementById(‘tta’);const msg=pre||ta?.value?.trim();if(!msg)return;if(ta){ta.value=’’;ar(ta);}const ms=document.getElementById(‘tmsgs’);ms.querySelector(’.twelcome’)?.remove();ms.innerHTML+=`<div class="tmsg u"><div class="mav uav">DR</div><div class="mbub ubub">${esc(msg)}</div></div>`;ms.innerHTML+=`<div class="tmsg ai" id="ldt"><div class="mav aiav">EP</div><div class="mbub aibub">${ldg()}</div></div>`;ms.scrollTop=ms.scrollHeight;const r=await callAI(msg);document.getElementById(‘ldt’)?.remove();ms.innerHTML+=`<div class="tmsg ai"><div class="mav aiav">EP</div><div class="mbub aibub">${r}</div></div>`;ms.scrollTop=ms.scrollHeight;}
-
+async function teachMe(topic,hint){const qa=document.getElementById(‘qa’);const old=qa.querySelector(’.tpanel’);if(old)old.remove();const p=document.createElement(‘div’);p.className=‘tpanel’;p.innerHTML=ldg(‘Loading explanation…’);qa.appendChild(p);p.scrollIntoView({behavior:‘smooth’});const r=await callAI(Deep board explanation of "${hint}" (topic:${topic}). Include cutoffs, formulas, guideline versions. Use HTML h3/h4/strong/ul/table tags.);p.innerHTML=<div class="tphdr">📚 Deep Dive: ${topic}</div><div class="tpbdy">${r}</div>;}
+async function showYT(topic){const qa=document.getElementById(‘qa’);const old=qa.querySelector(’.ytpanel’);if(old){old.remove();return;}const p=document.createElement(‘div’);p.className=‘ytpanel’;p.innerHTML=ldg(‘Finding videos…’);qa.appendChild(p);const chs=[{n:‘123Sonography’,u:‘https://www.youtube.com/@123sonography’},{n:‘ASE Official’,u:‘https://www.youtube.com/@ASEcho’},{n:‘Mayo Clinic CV’,u:‘https://www.youtube.com/@MayoClinic’},{n:‘EchoNation’,u:‘https://www.youtube.com/results?search_query=echonation+echo’},{n:‘Dr. Jack Colman’,u:‘https://www.youtube.com/results?search_query=jack+colman+echocardiography’}];p.innerHTML=<div class="ythdr">▶️ Videos: ${topic}</div><div class="ytgrid">${chs.slice(0,4).map(c=><a class="ytcard" href="https://www.youtube.com/results?search_query=${encodeURIComponent(c.n+' echocardiography '+topic)}" target="\_blank"><div class="ytthumb">▶</div><div><div class="yttitle">${c.n}</div><div class="ytch">${topic}</div></div></a>).join('')}</div><div class="ytchs"><span class="ytchlbl">Channels:</span>${chs.map(c=><a class="ytchbtn" href="${c.u}" target="\_blank">${c.n}</a>).join('')}</div>;}
+function renderTUI(sc){sc.innerHTML=<div class="twrap2"><div class="tmsgs" id="tmsgs"><div class="twelcome"><div class="twicon">🫀</div><div class="twtitle">Echo Tutor</div><div class="twsub">Ask me anything — concepts, guidelines, formulas.</div><div class="twchips">${\['Diastolic dysfunction grading ASE 2025 vs 2016','What changed in 2025 Right Heart guidelines?','Severe AS — all criteria','PISA method step by step','Physics: axial vs lateral resolution'\].map(q=><button class="twchip" onclick="sendT(${JSON.stringify(q)})">${q}</button>).join('')}</div></div></div><div class="tinput"><div class="trow"><textarea class="tta" id="tta" rows="1" placeholder="Ask about any echo concept..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendT();}" oninput="ar(this)"></textarea><button class="sbtn" onclick="sendT()">➤</button></div><div class="hints"><span class="hint" onclick="ih('Compare ASE 2016 vs 2025 for ')">⚖️ Compare</span><span class="hint" onclick="ih('Normal values for ')">📋 Normal values</span><span class="hint" onclick="ih('Formula for ')">🧮 Formula</span><span class="hint" onclick="ih('Physics explanation of ')">〰️ Physics</span></div></div></div>;}
+async function sendT(pre){const ta=document.getElementById(‘tta’);const msg=pre||ta?.value?.trim();if(!msg)return;if(ta){ta.value=’’;ar(ta);}const ms=document.getElementById(‘tmsgs’);ms.querySelector(’.twelcome’)?.remove();ms.innerHTML+=<div class="tmsg u"><div class="mav uav">DR</div><div class="mbub ubub">${esc(msg)}</div></div>;ms.innerHTML+=<div class="tmsg ai" id="ldt"><div class="mav aiav">EP</div><div class="mbub aibub">${ldg()}</div></div>;ms.scrollTop=ms.scrollHeight;const r=await callAI(msg);document.getElementById(‘ldt’)?.remove();ms.innerHTML+=<div class="tmsg ai"><div class="mav aiav">EP</div><div class="mbub aibub">${r}</div></div>;ms.scrollTop=ms.scrollHeight;}
 function ih(t){const ta=document.getElementById(‘tta’);if(ta){ta.value=t;ta.focus();ar(ta);}}
-
-function renderVUI(sc){sc.innerHTML=`<div class="vwrap"><div class="vhdr"><div class="vtitle">🫀 Clinical Vignette</div><button class="bp" onclick="genV()">New Case</button></div><div id="va"><div style="text-align:center;padding:32px;color:var(--tx3)"><p style="margin-bottom:16px">Clinical cases with echo findings and teaching points.</p><button class="bp lg" onclick="genV()">Generate Case 🫀</button></div></div></div>`;}
-
-async function genV(){const va=document.getElementById(‘va’);va.innerHTML=ldg(‘Generating clinical case…’);const t=A.ct===‘all’?smartT():A.ct;const r=await callAI(`Create a clinical echocardiography board exam vignette on: "${t}". Use this HTML format: <div class="case-section"><h4>🏥 Clinical Presentation</h4>2-3 sentence patient history</div><div class="case-section"><h4>📊 Echo Findings</h4>Specific echo measurements</div><div class="case-section"><h4>❓ Board Question</h4>The question</div><div class="cans" id="cans" style="display:none"><h4>✅ Answer</h4>Answer with guideline citation<div class="exprl">🎯 Exam Pearl: key point</div></div><button class="bp" style="margin-top:10px" onclick="document.getElementById('cans').style.display='block';this.style.display='none'">Reveal Answer</button>`,‘Generate realistic CCU/cardiology cases. Use HTML only.’);va.innerHTML=`<div class="vcard">${r}</div><div style="margin-top:12px;display:flex;gap:7px"><button class="bp" onclick="genV()">New Case ➤</button><button class="bs" onclick="showYT('${t}')">▶️ Videos</button></div>`;}
-
+function renderVUI(sc){sc.innerHTML=<div class="vwrap"><div class="vhdr"><div class="vtitle">🫀 Clinical Vignette</div><button class="bp" onclick="genV()">New Case</button></div><div id="va"><div style="text-align:center;padding:32px;color:var(--tx3)"><p style="margin-bottom:16px">Clinical cases with echo findings and teaching points.</p><button class="bp lg" onclick="genV()">Generate Case 🫀</button></div></div></div>;}
+async function genV(){const va=document.getElementById(‘va’);va.innerHTML=ldg(‘Generating clinical case…’);const t=A.ct===‘all’?smartT():A.ct;const r=await callAI(Create a clinical echocardiography board exam vignette on: "${t}". Use this HTML format: <div class="case-section"><h4>🏥 Clinical Presentation</h4>2-3 sentence patient history</div><div class="case-section"><h4>📊 Echo Findings</h4>Specific echo measurements</div><div class="case-section"><h4>❓ Board Question</h4>The question</div><div class="cans" id="cans" style="display:none"><h4>✅ Answer</h4>Answer with guideline citation<div class="exprl">🎯 Exam Pearl: key point</div></div><button class="bp" style="margin-top:10px" onclick="document.getElementById('cans').style.display='block';this.style.display='none'">Reveal Answer</button>,‘Generate realistic CCU/cardiology cases. Use HTML only.’);va.innerHTML=<div class="vcard">${r}</div><div style="margin-top:12px;display:flex;gap:7px"><button class="bp" onclick="genV()">New Case ➤</button><button class="bs" onclick="showYT('${t}')">▶️ Videos</button></div>;}
 function setupMock(){document.getElementById(‘msetup’).style.display=‘block’;document.getElementById(‘mrun’).style.display=‘none’;document.getElementById(‘mres’).style.display=‘none’;}
-
 async function startMock(){const n=parseInt(document.getElementById(‘mnum’).value)||20;A.mx={qs:[],as:[],cur:0,tot:n,st:Date.now()};document.getElementById(‘msetup’).style.display=‘none’;document.getElementById(‘mrun’).style.display=‘flex’;document.getElementById(‘mtot’).textContent=n;clearInterval(A.mt);A.mt=setInterval(()=>{const e=document.getElementById(‘mtimer’);if(e){const s=Math.floor((Date.now()-A.mx.st)/1000);e.textContent=Math.floor(s/60)+’:’+(s%60).toString().padStart(2,‘0’);}},1000);await loadMQ();}
-
-async function loadMQ(){const{cur,tot}=A.mx;document.getElementById(‘mprogT’).textContent=`Q${cur+1} of ${tot}`;document.getElementById(‘mpb’).style.width=(cur/tot*100)+’%’;const qa=document.getElementById(‘mqa’);qa.innerHTML=ldg(‘Loading…’);const q=await callQAI(smartT(),‘medium’);if(!q){qa.innerHTML=’<div class="errc">Error. <button class="bs" onclick="loadMQ()">Retry</button></div>’;return;}A.mx.qs.push(q);qa.innerHTML=`<div class="qcard"><div class="qmeta"><span class="qtg ttg">${q.topic}</span></div><div class="qtxt">${q.question}</div><div class="qopts">${q.options.map((o,i)=>`<button class="qopt" onclick="pickM(${i})"><span class="oltr">${String.fromCharCode(65+i)}</span><span>${o.replace(/^[A-D].\s*/,’’)}</span></button>`).join('')}</div><button class="bs" style="margin-top:8px" onclick="pickM(-1)">Skip →</button></div>`;}
-
+async function loadMQ(){const{cur,tot}=A.mx;document.getElementById(‘mprogT’).textContent=Q${cur+1} of ${tot};document.getElementById(‘mpb’).style.width=(cur/tot*100)+’%’;const qa=document.getElementById(‘mqa’);qa.innerHTML=ldg(‘Loading…’);const q=await callQAI(smartT(),‘medium’);if(!q){qa.innerHTML=’<div class="errc">Error. <button class="bs" onclick="loadMQ()">Retry</button></div>’;return;}A.mx.qs.push(q);qa.innerHTML=<div class="qcard"><div class="qmeta"><span class="qtg ttg">${q.topic}</span></div><div class="qtxt">${q.question}</div><div class="qopts">${q.options.map((o,i)=><button class="qopt" onclick="pickM(${i})"><span class="oltr">${String.fromCharCode(65+i)}</span><span>${o.replace(/^[A-D].\s*/,’’)}</span></button>).join('')}</div><button class="bs" style="margin-top:8px" onclick="pickM(-1)">Skip →</button></div>;}
 function pickM(s){A.mx.as.push(s);A.mx.cur++;if(A.mx.cur>=A.mx.tot){clearInterval(A.mt);showMR();}else loadMQ();}
-
-function showMR(){document.getElementById(‘mrun’).style.display=‘none’;document.getElementById(‘mres’).style.display=‘block’;const{qs,as,st,tot}=A.mx;let cor=0;const bt={};qs.forEach((q,i)=>{const ok=as[i]===q.correct;if(ok)cor++;if(!bt[q.topic])bt[q.topic]={c:0,t:0};bt[q.topic].t++;if(ok)bt[q.topic].c++;savePr(q.topic,ok);});const pct=Math.round(cor/tot*100);const el=Math.floor((Date.now()-st)/60000);document.getElementById(‘mresc’).innerHTML=`<div class="rfw"><div class="rfp" style="color:${pct>=70?'var(--ok)':'var(--dg)'}">${pct}%</div><div class="rfl">${cor}/${tot} correct</div></div><div class="msts"><div><div class="msv">${el}m</div><div class="msl2">Time</div></div><div><div class="msv" style="color:${pct>=70?'var(--ok)':'var(--dg)'}">${pct>=70?'PASS':'FAIL'}</div><div class="msl2">Result</div></div><div><div class="msv">${tot-cor}</div><div class="msl2">Wrong</div></div></div><div class="dc" style="margin-bottom:14px"><div class="dct">By Topic</div>${Object.entries(bt).map(([t,s])=>{const a=Math.round(s.c/s.t*100);return`<div class="mbr"><span>${t}</span><div class="mbrw"><div class="mbrb" style="width:${a}%;background:${a>=70?'var(--ok)':'var(--dg)'}"></div></div><span style="font-family:var(--fnm);font-size:.7rem;width:36px;text-align:right">${a}%</span></div>`;}).join('')}</div><button class="bp lg" onclick="setupMock()">Try Again</button>`;}
-
-function renderRef(){document.getElementById(‘rcon’).innerHTML=`<div class="rgrid"><div class="rcard"><h3>🔢 Normal Values (ASE 2015)</h3><table class="etable"><tr><th>Parameter</th><th>Normal</th></tr><tr><td>LVEF (men)</td><td>≥ 52%</td></tr><tr><td>LVEF (women)</td><td>≥ 54%</td></tr><tr><td>LVEDd (men)</td><td>&lt; 58 mm</td></tr><tr><td>LVEDd (women)</td><td>&lt; 52 mm</td></tr><tr><td>IVSd / PWd</td><td>6–10 mm</td></tr><tr><td>LAVI</td><td>≤ 34 mL/m²</td></tr><tr><td>E/e' avg</td><td>&lt; 14</td></tr><tr><td>TAPSE</td><td>≥ 17 mm</td></tr><tr><td>RV FAC</td><td>≥ 35%</td></tr><tr><td>GLS</td><td>≤ -20%</td></tr></table></div><div class="rcard"><h3>⬛ AS Severity (ASE/AHA 2021)</h3><table class="etable"><tr><th>Grade</th><th>Vmax</th><th>MG</th><th>AVA</th></tr><tr><td>Mild</td><td>2–3 m/s</td><td>&lt;20</td><td>&gt;1.5</td></tr><tr><td>Moderate</td><td>3–4 m/s</td><td>20–40</td><td>1.0–1.5</td></tr><tr><td>Severe</td><td>≥4 m/s</td><td>≥40</td><td>&lt;1.0</td></tr><tr><td>V.Severe</td><td>≥5 m/s</td><td>≥60</td><td>&lt;0.6</td></tr></table></div><div class="rcard"><h3>💧 MR Severity (ASE 2017)</h3><table class="etable"><tr><th>Grade</th><th>ERO</th><th>RVol</th><th>RF%</th></tr><tr><td>Mild</td><td>&lt;0.20</td><td>&lt;30</td><td>&lt;30</td></tr><tr><td>Moderate</td><td>0.20–0.39</td><td>30–59</td><td>30–49</td></tr><tr><td>Severe</td><td>≥0.40</td><td>≥60</td><td>≥50</td></tr></table></div><div class="rcard"><h3>🔄 AR Severity (ASE 2017)</h3><table class="etable"><tr><th>Grade</th><th>ERO</th><th>RVol</th><th>RF%</th></tr><tr><td>Mild</td><td>&lt;0.10</td><td>&lt;30</td><td>&lt;30</td></tr><tr><td>Moderate</td><td>0.10–0.29</td><td>30–59</td><td>30–49</td></tr><tr><td>Severe</td><td>≥0.30</td><td>≥60</td><td>≥50</td></tr></table></div><div class="rcard"><h3>📊 Diastolic Function (ASE 2025)</h3><table class="etable"><tr><th>Grade</th><th>Pattern</th><th>Filling P</th></tr><tr><td>Gr 1</td><td>Impaired relaxation</td><td>Normal</td></tr><tr><td>Gr 2</td><td>Pseudonormal</td><td>Elevated</td></tr><tr><td>Gr 3</td><td>Restrictive</td><td>Markedly ↑</td></tr></table><div class="rnote">Key: E/e', LAVI, TR Vmax, e', LA strain</div></div><div class="rcard"><h3>🧮 Key Formulas</h3><table class="etable"><tr><th>Formula</th><th>Equation</th></tr><tr><td>MVA (PHT)</td><td>220/PHT</td></tr><tr><td>AVA (cont.)</td><td>CSA₁×VTI₁/VTI₂</td></tr><tr><td>ERO (PISA)</td><td>2πr²×Va/Vpeak</td></tr><tr><td>Bernoulli</td><td>ΔP=4V²</td></tr><tr><td>RVSP</td><td>4(TR)²+RAP</td></tr><tr><td>SV</td><td>CSA_LVOT×VTI_LVOT</td></tr></table></div></div><div style="margin-top:12px"><div class="rcard"><h3>〰️ Physics Calculator</h3><div class="crow"><label>Frequency (MHz): <input type="number" id="cf" value="3.5" step="0.5" min="1" max="15" oninput="calcP()"></label><label>Depth (cm): <input type="number" id="cd" value="10" step="1" min="1" max="30" oninput="calcP()"></label></div><div class="cgrid" id="cres"></div></div></div>`;calcP();}
-
-function calcP(){const f=parseFloat(document.getElementById(‘cf’)?.value)||3.5;const d=parseFloat(document.getElementById(‘cd’)?.value)||10;const c=1540;const wl=(c/(f*1e6)*1000).toFixed(3);const pd=(1/(f*1e6)*1e6).toFixed(3);const prf=Math.round(c/(2*d/100));const nyq=Math.round(prf/2);const ax=(wl/2).toFixed(3);const rtt=(d/c*200*1000).toFixed(1);const el=document.getElementById(‘cres’);if(el)el.innerHTML=[[wl+’ mm’,‘Wavelength’],[pd+’ μs’,‘Period’],[prf.toLocaleString()+’ Hz’,‘Max PRF’],[nyq.toLocaleString()+’ Hz’,‘Nyquist’],[ax+’ mm’,‘Axial Res.’],[rtt+’ ms’,‘Round-trip’]].map(([v,l])=>`<div class="ci"><div class="civ">${v}</div><div class="cil">${l}</div></div>`).join(’’);}
-
+function showMR(){document.getElementById(‘mrun’).style.display=‘none’;document.getElementById(‘mres’).style.display=‘block’;const{qs,as,st,tot}=A.mx;let cor=0;const bt={};qs.forEach((q,i)=>{const ok=as[i]===q.correct;if(ok)cor++;if(!bt[q.topic])bt[q.topic]={c:0,t:0};bt[q.topic].t++;if(ok)bt[q.topic].c++;savePr(q.topic,ok);});const pct=Math.round(cor/tot*100);const el=Math.floor((Date.now()-st)/60000);document.getElementById(‘mresc’).innerHTML=<div class="rfw"><div class="rfp" style="color:${pct>=70?'var(--ok)':'var(--dg)'}">${pct}%</div><div class="rfl">${cor}/${tot} correct</div></div><div class="msts"><div><div class="msv">${el}m</div><div class="msl2">Time</div></div><div><div class="msv" style="color:${pct>=70?'var(--ok)':'var(--dg)'}">${pct>=70?'PASS':'FAIL'}</div><div class="msl2">Result</div></div><div><div class="msv">${tot-cor}</div><div class="msl2">Wrong</div></div></div><div class="dc" style="margin-bottom:14px"><div class="dct">By Topic</div>${Object.entries(bt).map((\[t,s\])=>{const a=Math.round(s.c/s.t\*100);return<div class="mbr"><span>${t}</span><div class="mbrw"><div class="mbrb" style="width:${a}%;background:${a>=70?'var(--ok)':'var(--dg)'}"></div></div><span style="font-family:var(--fnm);font-size:.7rem;width:36px;text-align:right">${a}%</span></div>;}).join('')}</div><button class="bp lg" onclick="setupMock()">Try Again</button>;}
+function renderRef(){document.getElementById(‘rcon’).innerHTML=<div class="rgrid"><div class="rcard"><h3>🔢 Normal Values (ASE 2015)</h3><table class="etable"><tr><th>Parameter</th><th>Normal</th></tr><tr><td>LVEF (men)</td><td>≥ 52%</td></tr><tr><td>LVEF (women)</td><td>≥ 54%</td></tr><tr><td>LVEDd (men)</td><td>&lt; 58 mm</td></tr><tr><td>LVEDd (women)</td><td>&lt; 52 mm</td></tr><tr><td>IVSd / PWd</td><td>6–10 mm</td></tr><tr><td>LAVI</td><td>≤ 34 mL/m²</td></tr><tr><td>E/e' avg</td><td>&lt; 14</td></tr><tr><td>TAPSE</td><td>≥ 17 mm</td></tr><tr><td>RV FAC</td><td>≥ 35%</td></tr><tr><td>GLS</td><td>≤ -20%</td></tr></table></div><div class="rcard"><h3>⬛ AS Severity (ASE/AHA 2021)</h3><table class="etable"><tr><th>Grade</th><th>Vmax</th><th>MG</th><th>AVA</th></tr><tr><td>Mild</td><td>2–3 m/s</td><td>&lt;20</td><td>&gt;1.5</td></tr><tr><td>Moderate</td><td>3–4 m/s</td><td>20–40</td><td>1.0–1.5</td></tr><tr><td>Severe</td><td>≥4 m/s</td><td>≥40</td><td>&lt;1.0</td></tr><tr><td>V.Severe</td><td>≥5 m/s</td><td>≥60</td><td>&lt;0.6</td></tr></table></div><div class="rcard"><h3>💧 MR Severity (ASE 2017)</h3><table class="etable"><tr><th>Grade</th><th>ERO</th><th>RVol</th><th>RF%</th></tr><tr><td>Mild</td><td>&lt;0.20</td><td>&lt;30</td><td>&lt;30</td></tr><tr><td>Moderate</td><td>0.20–0.39</td><td>30–59</td><td>30–49</td></tr><tr><td>Severe</td><td>≥0.40</td><td>≥60</td><td>≥50</td></tr></table></div><div class="rcard"><h3>🔄 AR Severity (ASE 2017)</h3><table class="etable"><tr><th>Grade</th><th>ERO</th><th>RVol</th><th>RF%</th></tr><tr><td>Mild</td><td>&lt;0.10</td><td>&lt;30</td><td>&lt;30</td></tr><tr><td>Moderate</td><td>0.10–0.29</td><td>30–59</td><td>30–49</td></tr><tr><td>Severe</td><td>≥0.30</td><td>≥60</td><td>≥50</td></tr></table></div><div class="rcard"><h3>📊 Diastolic Function (ASE 2025)</h3><table class="etable"><tr><th>Grade</th><th>Pattern</th><th>Filling P</th></tr><tr><td>Gr 1</td><td>Impaired relaxation</td><td>Normal</td></tr><tr><td>Gr 2</td><td>Pseudonormal</td><td>Elevated</td></tr><tr><td>Gr 3</td><td>Restrictive</td><td>Markedly ↑</td></tr></table><div class="rnote">Key: E/e', LAVI, TR Vmax, e', LA strain</div></div><div class="rcard"><h3>🧮 Key Formulas</h3><table class="etable"><tr><th>Formula</th><th>Equation</th></tr><tr><td>MVA (PHT)</td><td>220/PHT</td></tr><tr><td>AVA (cont.)</td><td>CSA₁×VTI₁/VTI₂</td></tr><tr><td>ERO (PISA)</td><td>2πr²×Va/Vpeak</td></tr><tr><td>Bernoulli</td><td>ΔP=4V²</td></tr><tr><td>RVSP</td><td>4(TR)²+RAP</td></tr><tr><td>SV</td><td>CSA_LVOT×VTI_LVOT</td></tr></table></div></div><div style="margin-top:12px"><div class="rcard"><h3>〰️ Physics Calculator</h3><div class="crow"><label>Frequency (MHz): <input type="number" id="cf" value="3.5" step="0.5" min="1" max="15" oninput="calcP()"></label><label>Depth (cm): <input type="number" id="cd" value="10" step="1" min="1" max="30" oninput="calcP()"></label></div><div class="cgrid" id="cres"></div></div></div>;calcP();}
+function calcP(){const f=parseFloat(document.getElementById(‘cf’)?.value)||3.5;const d=parseFloat(document.getElementById(‘cd’)?.value)||10;const c=1540;const wl=(c/(f1e6)1000).toFixed(3);const pd=(1/(f1e6)1e6).toFixed(3);const prf=Math.round(c/(2d/100));const nyq=Math.round(prf/2);const ax=(wl/2).toFixed(3);const rtt=(d/c200*1000).toFixed(1);const el=document.getElementById(‘cres’);if(el)el.innerHTML=[[wl+’ mm’,‘Wavelength’],[pd+’ μs’,‘Period’],[prf.toLocaleString()+’ Hz’,‘Max PRF’],[nyq.toLocaleString()+’ Hz’,‘Nyquist’],[ax+’ mm’,‘Axial Res.’],[rtt+’ ms’,‘Round-trip’]].map(([v,l])=><div class="ci"><div class="civ">${v}</div><div class="cil">${l}</div></div>).join(’’);}
 function doBM(q,t){const ex=A.bm.find(b=>b.q===q);if(ex){A.bm=A.bm.filter(b=>b.q!==q);toast(‘Bookmark removed’);}else{A.bm.push({q,t,d:new Date().toISOString()});toast(‘Bookmarked! ⭐’);}saveLocal();}
-
-function renderBM(){const el=document.getElementById(‘bmcon’);if(!A.bm.length){el.innerHTML=’<div class="empty">⭐ No bookmarks yet.</div>’;return;}el.innerHTML=A.bm.map((b,i)=>`<div class="bmc"><div class="bmt">${b.t}</div><div class="bmq">${b.q}</div><div style="display:flex;gap:6px"><button class="bs" onclick="A.ct='${b.t}';A.sm='quiz';go('study')">📖 Study Topic</button><button class="bs" onclick="A.bm.splice(${i},1);saveLocal();renderBM()">🗑️ Remove</button></div></div>`).join(’’);}
-
+function renderBM(){const el=document.getElementById(‘bmcon’);if(!A.bm.length){el.innerHTML=’<div class="empty">⭐ No bookmarks yet.</div>’;return;}el.innerHTML=A.bm.map((b,i)=><div class="bmc"><div class="bmt">${b.t}</div><div class="bmq">${b.q}</div><div style="display:flex;gap:6px"><button class="bs" onclick="A.ct='${b.t}';A.sm='quiz';go('study')">📖 Study Topic</button><button class="bs" onclick="A.bm.splice(${i},1);saveLocal();renderBM()">🗑️ Remove</button></div></div>).join(’’);}
 function renderLib(){var books = [‘Klein Echo Review’,‘Pai 500 Questions’,‘Feigenbaum’,‘Otto Echo’,‘ASE Guidelines’,‘Custom PDF’];var cards = ‘’;for(var i=0;i<books.length;i++){var n=books[i], id=‘f-’+n.replace(/ /g,’-’);cards += ‘<div class="uc"><div class="ucicon">📄</div><div class="ucname">’+n+’</div>’+’<input type="file" accept=".pdf" id="'+id+'" style="display:none">’+’<button class="bs upload-btn" data-book="'+n+'" data-id="'+id+'">Choose PDF</button></div>’;}document.getElementById(‘libcon’).innerHTML = ‘<div class="lwrap"><h3>📚 PDF Library</h3>’+’<p class="ldesc">Upload echo textbooks — stored in Firebase, available on all devices.</p>’+’<div class="ugrid">’+cards+’</div>’+’<div id="uploaded-list"><div class="lnote">Checking uploaded files…</div></div>’+’<div class="lnote">📌 PDFs stored in Firebase Storage. AI uses uploaded content as primary source.</div></div>’;loadUploadedList();setTimeout(setupUploadBtns, 100);}
-
 async function loadUploadedList(){try{var ref = storage.ref(‘pdfs/’);var list = await ref.listAll();var el = document.getElementById(‘uploaded-list’);if(!el) return;if(list.items.length === 0){el.innerHTML = ‘<div class="lnote">No PDFs uploaded yet.</div>’;return;}var html = ‘<h4 style="font-size:.8rem;color:var(--tx2);margin:12px 0 8px">Uploaded Books:</h4>’;list.items.forEach(function(item){html += ‘<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:.8rem;color:var(--tx2)">✅ ‘+item.name+’</div>’;});el.innerHTML = html;}catch(e){console.error(‘Storage list error:’,e);var el = document.getElementById(‘uploaded-list’);if(el) el.innerHTML = ‘<div class="lnote">⚠️ Could not load file list. Storage permissions may need updating.</div>’;}}
-
 function triggerUpload(btn, name){var id = ‘f-’+name.replace(/ /g,’-’);var inp = document.getElementById(id);if(inp){ inp.onchange = function(){ upPDF(this, name); }; inp.click(); }}
 function setupUploadBtns(){var btns = document.querySelectorAll(’.upload-btn’);btns.forEach(function(btn){btn.addEventListener(‘click’, function(){triggerUpload(this, this.getAttribute(‘data-book’));});});}
-
 async function upPDF(input,name){const file=input.files[0];if(!file)return;toast(‘Uploading ‘+name+’…’);try{const r=storage.ref(‘pdfs/’+name+’_’+Date.now()+’.pdf’);await r.put(file);toast(‘✅ ‘+name+’ uploaded!’);}catch(e){toast(’Upload failed: ’+e.message,‘err’);}}
-
 function renderSet(){var ed = A.ed.toISOString().split(‘T’)[0];document.getElementById(‘setcon’).innerHTML = ‘<div class="swrap"><h3>Settings</h3>’ +’<div class="sg"><label class="slbl">Exam Date</label>’ +’<input type="date" class="sinput" id="edInput" value="' + ed + '"></div>’ +’<div class="sg"><label class="slbl">Font Size</label>’ +’<div style="display:flex;gap:7px">’ +’<button class="bs" onclick="setFS(13)">Small</button>’ +’<button class="bs" onclick="setFS(15)">Medium</button>’ +’<button class="bs" onclick="setFS(17)">Large</button>’ +’</div></div>’ +’<div class="sg"><label class="slbl">Reset Progress</label>’ +’<button class="bdanger" onclick="resetProgress()">Reset All Progress</button>’ +’</div></div>’;var inp = document.getElementById(‘edInput’);if(inp) inp.addEventListener(‘change’, function(){A.ed=new Date(this.value);localStorage.setItem(‘ep_ed’,this.value);toast(‘Saved’);});}
-
 function resetProgress(){if(confirm(‘Reset all progress?’)){A.pr={};A.srs={};saveLocal();renderSB();toast(‘Reset done’);}}
-
 function setFS(sz){document.documentElement.style.fontSize=sz+‘px’;toast(‘Font size updated’);}
-
 function savePr(t,ok){if(!A.pr[t])A.pr[t]={a:0,c:0};A.pr[t].a++;if(ok)A.pr[t].c++;A.qs.t++;if(ok)A.qs.c++;saveLocal();renderSB();const e=document.getElementById(‘qscore’);if(e)e.textContent=‘Score: ‘+A.qs.c+’/’+A.qs.t;}
-
-function saveSRS(id,ok,conf){const ex=A.srs[id]||{iv:1,ef:2.5,rp:0};let{iv,ef,rp}=ex;if(ok&&conf===‘got_it’){rp++;iv=rp===1?1:rp===2?3:Math.round(iv*ef);ef=Math.min(3,ef+.1);}else if(ok){iv=Math.max(1,Math.round(iv*.8));}else{rp=0;iv=1;ef=Math.max(1.3,ef-.2);}A.srs[id]={iv,ef,rp,nr:Date.now()+iv*86400000};saveLocal();}
-
+function saveSRS(id,ok,conf){const ex=A.srs[id]||{iv:1,ef:2.5,rp:0};let{iv,ef,rp}=ex;if(ok&&conf===‘got_it’){rp++;iv=rp===1?1:rp===2?3:Math.round(ivef);ef=Math.min(3,ef+.1);}else if(ok){iv=Math.max(1,Math.round(iv.8));}else{rp=0;iv=1;ef=Math.max(1.3,ef-.2);}A.srs[id]={iv,ef,rp,nr:Date.now()+iv*86400000};saveLocal();}
 async function callAI(msg,extra=’’){
 A.ch.push({role:‘user’,content:msg});
 if(A.ch.length>16)A.ch=A.ch.slice(-16);
@@ -877,7 +794,6 @@ A.ch.push({role:‘assistant’,content:reply});
 return reply;
 }catch(e){console.error(‘callAI error:’,e);return’Error: ’+e.message;}
 }
-
 async function callQAI(topic, diff) {
 var w = getWeak();
 var weakStr = w.length > 0 ? ‘Weak areas: ’ + w.join(’, ’) + ’. ’ : ‘’;
@@ -892,7 +808,7 @@ var r = await fetch(GROQ_URL, {method: ‘POST’,headers: {‘Content-Type’: 
 var d = await r.json();
 if (d.error) return null;
 var t = d.choices?.[0]?.message?.content || ‘{}’;
-t = t.replace(/`json|`/g, ‘’).trim();
+t = t.replace(/json|/g, ‘’).trim();
 var p = JSON.parse(t);
 if (!p.question || !p.options) return null;
 return p;
@@ -901,10 +817,8 @@ console.error(‘callQAI error:’, e);
 return null;
 }
 }
-
 let isL = true;
 function toggleAuth() {isL = !isL;document.getElementById(‘nwrap’).style.display = isL ? ‘none’ : ‘block’;document.getElementById(‘abtn’).textContent = isL ? ‘Sign In’ : ‘Create Account’;document.getElementById(‘atog’).innerHTML = isL ? ‘New user? <a onclick="toggleAuth()">Create account</a>’ : ‘Have account? <a onclick="toggleAuth()">Sign in</a>’;}
-
 async function doAuth() {
 const e = document.getElementById(‘aemail’).value;const p = document.getElementById(‘apass’).value;
 const err = document.getElementById(‘aerr’);err.textContent = ‘’;
@@ -914,12 +828,10 @@ else await firebase.auth().createUserWithEmailAndPassword(e, p);
 document.getElementById(‘auth’).style.display = ‘none’;document.getElementById(‘app’).style.display = ‘flex’;
 } catch (ex) {err.textContent = ex.message.replace(’Firebase: ’, ‘’);}
 }
-
 function ar(el) {el.style.height = ‘auto’;el.style.height = Math.min(el.scrollHeight, 100) + ‘px’;}
 function toast(msg, type = ‘’) {const t = document.getElementById(‘toast’);t.textContent = msg;t.className = ‘toast show’ + (type ? ’ ’ + type : ‘’);setTimeout(() => t.className = ‘toast’, 2500);}
-function ldg(txt = ‘’) {return `<div class="ldc"><div class="dots"><span></span><span></span><span></span></div>${txt ? '<div class="ldtxt">' + txt + '</div>' : ''}</div>`;}
+function ldg(txt = ‘’) {return <div class="ldc"><div class="dots"><span></span><span></span><span></span></div>${txt ? '<div class="ldtxt">' + txt + '</div>' : ''}</div>;}
 function esc(s) {return s.replace(/&/g, ‘&’).replace(/</g, ‘<’).replace(/>/g, ‘>’);}
 </script>
-
 </body>
 </html>
