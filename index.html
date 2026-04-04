@@ -100,7 +100,7 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
 .ecd { font-family: var(--fnm); font-size: 2rem; color: var(--wn); font-weight: 600; }
 .ecl { font-size: 0.75rem; color: var(--tx3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* NEW: Daily Reminder Banner */
+/* Daily Reminder Banner */
 .dbanner { background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15)); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }
 .db-txt { font-weight: 500; font-size: 0.95rem; }
 .db-tgt { background: var(--ac); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
@@ -113,7 +113,7 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
 .drow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .dct { font-size: 0.9rem; color: var(--tx); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
 
-/* NEW: Progress Heatmap */
+/* Progress Heatmap */
 .heatmap { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; margin-top: 12px; }
 .hm-box { aspect-ratio: 1; border-radius: 4px; background: var(--bg); border: 1px solid var(--bd); }
 .hm-box.active { background: var(--ok); border-color: rgba(16,185,129,0.5); box-shadow: 0 0 8px rgba(16,185,129,0.3); }
@@ -151,7 +151,7 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
 .qsl { font-family: var(--fnm); font-size: 0.8rem; color: var(--tx3); margin-top: 4px; }
 .dsel { background: var(--bg); border: 1px solid var(--bd); color: var(--tx2); padding: 8px 12px; border-radius: 8px; font-family: var(--fn); font-size: 0.85rem; outline: none; cursor: pointer; }
 
-/* NEW: Timer Bar */
+/* Timer Bar */
 .tbar-wrap { height: 6px; background: var(--bg); border-radius: 3px; margin-bottom: 16px; overflow: hidden; display: none; }
 .tbar-fill { height: 100%; background: var(--wn); width: 100%; transition: width 1s linear, background 0.3s; }
 
@@ -181,7 +181,7 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
 .exbdy { font-size: 0.95rem; line-height: 1.7; color: var(--tx2); }
 .exprl { margin-top: 16px; padding: 12px 16px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; font-size: 0.9rem; color: var(--wn); line-height: 1.5; }
 
-/* NEW: Personal Notes Area */
+/* Personal Notes Area */
 .pnotes { margin-top: 16px; padding: 16px; background: var(--sf); border: 1px dashed var(--bd); border-radius: 10px; }
 .pn-ta { width: 100%; background: var(--bg); border: 1px solid var(--bd); color: var(--tx); border-radius: 8px; padding: 10px; font-family: var(--fn); font-size: 0.9rem; resize: vertical; min-height: 80px; margin-top: 8px; outline: none; }
 .pn-ta:focus { border-color: var(--ac); }
@@ -306,7 +306,7 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
 .vbox { background: var(--bg); border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
 .vbox-title { font-size: 0.7rem; margin-bottom: 8px; font-weight: 600; }
 
-/* NEW: Floating Action Button (Formula Sheet) */
+/* Floating Action Button (Formula Sheet) */
 .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 28px; background: var(--ac2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(139,92,246,0.4); cursor: pointer; z-index: 90; transition: transform 0.2s; border: none; }
 .fab:hover { transform: scale(1.1); }
 .fab-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.8); z-index: 95; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -375,9 +375,18 @@ body { font-family: var(--fn); font-size: 15px; background: var(--bg); color: va
         <div class="dbanner">
           <div>
             <div class="db-txt">👋 Welcome back! <span id="days-banner"></span> days until ASCeXAM.</div>
-            <div style="font-size:0.8rem; color:var(--tx3); margin-top:4px;">Recommended: Complete 20 questions today.</div>
+            <div style="font-size:0.85rem; color:var(--tx2); margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="chk-q20" style="width:16px; height:16px; accent-color:var(--ac);" onchange="toggleTask('q20', this.checked)">
+                Complete 20 Practice Questions
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="chk-mayo" style="width:16px; height:16px; accent-color:var(--ac);" onchange="toggleTask('mayo', this.checked)">
+                Mayo Clinic Board Echo Daily Task Review
+              </label>
+            </div>
           </div>
-          <div class="db-tgt">Daily Target: 0/20</div>
+          <div class="db-tgt" id="db-tgt">Daily Target: 0/2</div>
         </div>
 
         <div class="sgrid">
@@ -485,7 +494,7 @@ const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
 firebase.initializeApp({apiKey:"AIzaSyAt8jyv7YVGLHuCKREoMgZintE6HSlZCjA",authDomain:"echo-prep.firebaseapp.com",projectId:"echo-prep",storageBucket:"echo-prep.firebasestorage.app",messagingSenderId:"868860955040",appId:"1:868860955040:web:a8d7a28d7ea9b90d6dbcc5"});
 const db=firebase.firestore();const storage=firebase.storage();
 
-const A={ct:'all',sm:'quiz',ch:[],qs:{c:0,t:0},ed:new Date('2026-07-01'),pr:{},srs:{},bm:[],streak:{count:0,lastDate:null},rc:null,mx:{qs:[],as:[],cur:0,tot:20,st:null},mt:null, notes:{}, history:[], timed:false, drillQsLeft:0, tInt:null};
+const A={ct:'all',sm:'quiz',ch:[],qs:{c:0,t:0},ed:new Date('2026-07-01'),pr:{},srs:{},bm:[],streak:{count:0,lastDate:null},rc:null,mx:{qs:[],as:[],cur:0,tot:20,st:null},mt:null, notes:{}, history:[], tasks:{date:null, q20:false, mayo:false}, timed:false, drillQsLeft:0, tInt:null};
 
 const TOPICS=[{id:'physics',label:'Physics & Artifacts',icon:'〰️'},{id:'doppler',label:'Doppler Principles',icon:'📡'},{id:'anatomy-2d',label:'2D Imaging & Anatomy',icon:'🖼️'},{id:'lv-systolic',label:'LV Systolic Function',icon:'❤️'},{id:'diastology',label:'LV Diastolic Function',icon:'📊'},{id:'rv',label:'RV Assessment',icon:'🫁'},{id:'la',label:'Left Atrium',icon:'🔷'},{id:'mitral-stenosis',label:'Mitral Stenosis',icon:'🔵'},{id:'mitral-regurg',label:'Mitral Regurgitation',icon:'💧'},{id:'aortic-stenosis',label:'Aortic Stenosis',icon:'⬛'},{id:'aortic-regurg',label:'Aortic Regurgitation',icon:'🔄'},{id:'tricuspid',label:'Tricuspid Valve',icon:'🔺'},{id:'pulmonic',label:'Pulmonic Valve',icon:'🫧'},{id:'pericardium',label:'Pericardial Disease',icon:'🫀'},{id:'aorta',label:'Aortic Disease',icon:'🩸'},{id:'cardiomyopathy',label:'Cardiomyopathies',icon:'🧬'},{id:'congenital',label:'Congenital HD',icon:'👶'},{id:'hemodynamics',label:'Hemodynamics',icon:'📈'},{id:'stress-echo',label:'Stress Echo',icon:'🏃'},{id:'tee',label:'TEE',icon:'🖥️'},{id:'contrast',label:'Contrast Echo',icon:'💉'},{id:'strain-gls',label:'Strain & GLS',icon:'📐'},{id:'critical-care',label:'Critical Care Echo',icon:'🏥'},{id:'normal-values',label:'Normal Values',icon:'📋'},{id:'formulas',label:'Formulas & Calc',icon:'🧮'}];
 
@@ -502,6 +511,7 @@ function loadLocal(){
   A.streak=JSON.parse(localStorage.getItem('ep_str')||'{"count":0,"lastDate":null}');
   A.notes=JSON.parse(localStorage.getItem('ep_notes')||'{}');
   A.history=JSON.parse(localStorage.getItem('ep_hist')||'[]');
+  A.tasks=JSON.parse(localStorage.getItem('ep_tasks')||'{"date":null,"q20":false,"mayo":false}');
   const ed=localStorage.getItem('ep_ed');if(ed)A.ed=new Date(ed);
   updStreak();
 }
@@ -513,6 +523,7 @@ function saveLocal(){
   localStorage.setItem('ep_str',JSON.stringify(A.streak));
   localStorage.setItem('ep_notes',JSON.stringify(A.notes));
   localStorage.setItem('ep_hist',JSON.stringify(A.history));
+  localStorage.setItem('ep_tasks',JSON.stringify(A.tasks));
 }
 
 function updStreak(){
@@ -550,6 +561,32 @@ function go(p){
 
 function toggleSB(){document.getElementById('sb').classList.toggle('open');}
 
+function toggleTask(id, val) {
+  A.tasks[id] = val;
+  saveLocal();
+  updateTaskUI();
+  if(val) toast('Task completed! ✅');
+}
+
+function updateTaskUI() {
+  const today = new Date().toISOString().split('T')[0];
+  if (A.tasks.date !== today) {
+    A.tasks = { date: today, q20: false, mayo: false };
+    saveLocal();
+  }
+  const cq = document.getElementById('chk-q20');
+  const cm = document.getElementById('chk-mayo');
+  if(cq) cq.checked = A.tasks.q20;
+  if(cm) cm.checked = A.tasks.mayo;
+  
+  let done = 0;
+  if(A.tasks.q20) done++;
+  if(A.tasks.mayo) done++;
+  
+  const dt = document.getElementById('db-tgt');
+  if(dt) dt.textContent = `Daily Target: ${done}/2`;
+}
+
 function renderDash(){
   const tot=Object.values(A.pr).reduce((s,t)=>s+(t.a||0),0);
   const cor=Object.values(A.pr).reduce((s,t)=>s+(t.c||0),0);
@@ -570,6 +607,7 @@ function renderDash(){
   var pEl=document.getElementById('ptxt');
   if(pEl) pEl.textContent=PEARLS[new Date().getDate()%PEARLS.length];
   
+  updateTaskUI();
   renderWeak();
   renderRadar();
   renderHeatmap();
@@ -671,9 +709,8 @@ async function genQ(){
   
   qa.innerHTML=ldg('Generating question...');
   
-  // Drill mode logic
   if(A.drillQsLeft > 0 && A.drillQsLeft <= 5) { A.drillQsLeft--; }
-  else if(A.drillQsLeft === 0) { A.drillQsLeft = -1; /* Reset */ }
+  else if(A.drillQsLeft === 0) { A.drillQsLeft = -1; }
   
   const d=document.getElementById('dsel')?.value||'medium';
   const t=A.ct==='all'?smartT():A.ct;
@@ -685,9 +722,8 @@ async function genQ(){
   }
   
   renderQ(q,qa);
-  trackDay(); // Log activity for heatmap
+  trackDay(); 
   
-  // Timed Mode Logic
   if(A.timed) {
     let timeLeft = 60;
     const bar = document.getElementById('tbar');
