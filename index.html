@@ -719,39 +719,53 @@ return 'Network error. Please try again.';
 }
 
 async function callQAI(topic, diff) {
-var w = getWeak();
-var weakStr = w.length > 0 ? 'Weak areas: ' + w.join(', ') + '. ' : '';
-var diffStr = diff || 'medium';
-var pr = 'You are an expert ASCeXAM echocardiography board exam question writer. ' + weakStr +
-'Generate ONE ' + diffStr + ' difficulty MCQ on: ' + topic + '. ' +
-'Physics questions need extra detail. Base on ASE guidelines, Klein Echo Review, Pai 500 MCQs. ' +
-'Output ONLY valid JSON with no markdown and no backticks: ' +
-'{"question":"...","options":["A. ...","B. ...","C. ...","D. ..."],"correct":0,"explanation":"...with guideline...","topic":"' + topic + '","difficulty":"' + diffStr + '","pearl":"...exam pearl..."}';
-try {
-var r = await fetch(GROQ_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ payload: {
-model: 'llama-3.3-70b-versatile',
-messages: [
-{ role: 'system', content: 'You are an expert echocardiography board exam question writer. Output ONLY valid JSON, no markdown, no backticks, no extra text.' },
-{ role: 'user', content: pr }
-],
-max_tokens: 1000,
-temperature: 0.8
-}})
-});
-var d = await r.json();
-if (d.error) { console.error('Quiz error:', d.error); return null; }
-var t = d.choices?.[0]?.message?.content || '{}';
-t = t.replace(/`json|`/g, '').trim();
-var p = JSON.parse(t);
-if (!p.question || !p.options) return null;
-return p;
-} catch (e) {
-console.error('callQAI error:', e);
-return null;
-}
+  var w = getWeak();
+  var weakStr = w.length > 0 ? 'Weak areas: ' + w.join(', ') + '. ' : '';
+  var diffStr = diff || 'medium';
+  var pr = 'You are an expert ASCeXAM echocardiography board exam question writer. ' + weakStr +
+  'Generate ONE ' + diffStr + ' difficulty MCQ on: ' + topic + '. ' +
+  'Physics questions need extra detail. Base on ASE guidelines, Klein Echo Review, Pai 500 MCQs. ' +
+  'Output ONLY valid JSON with no markdown and no conversational text: ' +
+  '{"question":"...","options":["A. ...","B. ...","C. ...","D. ..."],"correct":0,"explanation":"...with guideline...","topic":"' + topic + '","difficulty":"' + diffStr + '","pearl":"...exam pearl..."}';
+  
+  try {
+    var r = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload: {
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: 'You are an expert echocardiography board exam question writer. Output ONLY valid JSON.' },
+          { role: 'user', content: pr }
+        ],
+        max_tokens: 1000,
+        temperature: 0.8
+      }})
+    });
+    
+    var d = await r.json();
+    if (d.error) { console.error('Quiz API error:', d.error); return null; }
+    
+    var t = d.choices?.[0]?.message?.content || '';
+    
+    var start = t.indexOf('{');
+    var end = t.lastIndexOf('}');
+    
+    if (start === -1 || end === -1) {
+        console.error('No JSON object found in response:', t);
+        return null;
+    }
+    
+    var jsonString = t.substring(start, end + 1);
+    var p = JSON.parse(jsonString);
+    
+    if (!p.question || !p.options) return null;
+    return p;
+    
+  } catch (e) {
+    console.error('callQAI execution error:', e);
+    return null;
+  }
 }
 
 let isL = true;
